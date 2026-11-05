@@ -67,6 +67,57 @@ go build -tags desktop,production -ldflags "-H windowsgui -w -s" -o coffee24h.ex
 
 ---
 
+## ⚙️ Various Ways to Set Up Coffee24h
+
+Coffee24h provides multiple flexible setup options depending on how you like to use your utilities:
+
+### 🌟 1-Click Multi-Setup Manager
+Double-click **`setup.cmd`** (or run `.\setup.ps1` via PowerShell) to open the interactive setup manager:
+
+```text
+==============================================================
+   Coffee24h - Multi-Setup Manager (Various Setup Options)
+  Keep-Awake Utility for Gia Dinh University (GDU)
+==============================================================
+  [1] Full Setup (All Recommended Setups in 1-Click)
+  [2] Terminal CLI Setup (Add to PATH & WinGet Links)
+  [3] Auto-Start on Windows Login (Silent to System Tray)
+  [4] Create Desktop Shortcut (Custom GDU Icon)
+  [5] Create Start Menu Shortcut (Windows Searchable)
+  [6] Win + R Run Dialog ('coffee24h')
+  [7] PowerShell Profile Aliases ('coffee', 'c24')
+  [8] Remove / Uninstall All Integrations
+```
+
+### 🛠️ Individual Setup Methods
+
+1. **Auto-Start on Boot (Silent Background Tray)**:
+   - Starts silently on Windows startup inside "Show hidden icons".
+   - Setup: Run `.\setup.ps1 -Startup`
+2. **Global Terminal CLI**:
+   - Access `coffee24h` from any PowerShell or CMD window.
+   - Setup: Run `.\setup.ps1 -Cli`
+3. **Desktop Shortcut**:
+   - Creates a direct desktop launcher with the high-res GDU custom icon.
+   - Setup: Run `.\setup.ps1 -DesktopShortcut`
+4. **Start Menu Integration**:
+   - Adds Coffee24h to Windows Start Menu so you can press `Win` and search "Coffee24h".
+   - Setup: Run `.\setup.ps1 -StartMenu`
+5. **Windows Run Dialog (`Win + R`)**:
+   - Type `coffee24h` in the Run prompt and press Enter.
+   - Setup: Run `.\setup.ps1 -RunDialog`
+6. **PowerShell Profile Aliases**:
+   - Adds shorthand commands (`coffee`, `c24`) to your `$PROFILE`.
+   - Setup: Run `.\setup.ps1 -PowerShellProfile`
+7. **Complete 1-Click Setup (All-in-One)**:
+   ```powershell
+   .\setup.cmd -All
+   # Or in PowerShell:
+   powershell -ExecutionPolicy Bypass -File .\setup.ps1 -All
+   ```
+
+---
+
 ## 💻 Command-Line Interface (CLI)
 
 Coffee24h supports seamless terminal execution and automation flags from any directory.
