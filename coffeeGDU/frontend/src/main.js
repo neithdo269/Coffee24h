@@ -397,6 +397,11 @@ function renderUI() {
   });
 
   presetsBar.style.display = state.mode === 'timed' ? 'flex' : 'none';
+  if (state.mode === 'timed') {
+    document.body.classList.add('mode-timed');
+  } else {
+    document.body.classList.remove('mode-timed');
+  }
 
   // Battery status
   if (state.battery) {

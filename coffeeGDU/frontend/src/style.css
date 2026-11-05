@@ -715,3 +715,31 @@ input:checked + .slider:before {
   letter-spacing: 0.1px;
   opacity: 0.85;
 }
+
+/* Scoped layout ONLY when Timed mode is selected, keeping "Vo Han" and "Chay Nen" 100% untouched */
+body.mode-timed .app-container {
+  gap: 3px;
+}
+
+body.mode-timed .hero-toggle-card {
+  padding: 3px 8px 4px 8px;
+}
+
+body.mode-timed .main-toggle-btn {
+  width: 36px;
+  height: 36px;
+}
+
+body.mode-timed .controls-card {
+  padding: 4px 8px 3px 8px;
+  gap: 3px;
+}
+
+body.mode-timed .presets-bar {
+  margin-block-start: 2px;
+}
+
+body.mode-timed .preset-chip {
+  padding-block: 2px;
+  font-size: 9px;
+}
