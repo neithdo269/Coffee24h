@@ -45,13 +45,32 @@ html {
 }
 
 body {
-  font-family: var(--font-family);
-  background: radial-gradient(circle at 50% 0%, #0d274c 0%, #061120 100%);
-  color: var(--text-main);
+  margin: 0;
+  padding: 0;
   width: 100%;
   height: 100%;
+  background: transparent !important;
+  color: var(--text-main);
   box-sizing: border-box;
   overflow: hidden; /* Bỏ thanh scrollbar bên cạnh */
+}
+
+/* [ARCHITECTURE PATTERN: 4-CORNER ANTIALIASED ROUNDED SHELL]
+   Fix for "Sharp Corners on Win10 / Only 1 Corner Rounded":
+   In CSS specifications, setting a non-transparent background on body causes Chromium
+   to propagate the background to the viewport canvas, filling the 4 corners outside the border-radius.
+   By keeping html and body 100% transparent and hosting the background, border, and border-radius: 14px
+   on #app, Chromium clips only the #app container to the 14px rounded rectangle.
+   All 4 outer corners remain genuinely transparent, exposing smooth subpixel curves on Windows 10/11. */
+#app {
+  font-family: var(--font-family);
+  background: radial-gradient(circle at 50% 0%, #0d274c 0%, #061120 100%);
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(59, 130, 246, 0.35);
