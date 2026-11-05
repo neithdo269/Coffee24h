@@ -1,0 +1,20 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "coffee24h",
+  "outputfilename": "coffee24h",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Neith Do",
+    "email": "16av112thien@gmail.com"
+  },
+  "info": {
+    "companyName": "Gia Dinh University (GDU)",
+    "productName": "Coffee24h",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026 Neith Do - GDU Open License",
+    "comments": "Coffee24h - Cross-Platform Keep-Awake Utility for GDU"
+  }
+}

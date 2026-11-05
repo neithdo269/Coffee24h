@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Coffee24h
+GenericName=Keep-Awake Utility
+Comment=Giữ máy tính luôn thức sáng và chạy tác vụ nền (GDU Window Manager Project)
+Exec=coffee24h %u
+Icon=coffee24h
+Terminal=false
+Categories=Utility;System;Settings;
+Keywords=coffee;awake;sleep;inhibit;gdu;stayawake;
+StartupNotify=true
+StartupWMClass=coffee24h
+X-GNOME-UsesNotifications=true

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee24h</title>
+    <link rel="icon" type="image/png" href="CoffeeGDU icons/Coffee-24h-GDU-64Gperpackage-icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="card">
+        <header>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px;">
+                <img src="CoffeeGDU icons/Coffee-24h-GDU-64Gperpackage-icon.png" alt="Coffee24h" style="width: 36px; height: 36px; border-radius: 8px; object-fit: contain;" />
+                <h1 class="brand-title" style="margin-bottom: 0;">Coffee24h <span class="gdu-tag">GDU</span></h1>
+            </div>
+            <div class="brand-subtitle">Đại học Gia Định (GDU) • Bật Ý Tưởng</div>
+
+            <!-- Piece 5: Smart Battery & Charger Badge -->
+            <div class="battery-badge" id="batteryBadge" aria-label="Battery Status">
+                <span class="battery-icon" id="batteryIcon">⚡</span>
+                <span class="battery-text" id="batteryText">100% • Plugged In</span>
+            </div>
+        </header>
+
+        <!-- Piece 7: Mode Selection (Until Off, Timed, System Only) -->
+        <section class="mode-selector" aria-label="Awake Mode Selection">
+            <button type="button" class="mode-chip" data-mode="until_off">♾️ Until Off</button>
+            <button type="button" class="mode-chip active" data-mode="timed">⏱️ Timed</button>
+            <button type="button" class="mode-chip" data-mode="system_only">💻 System Only</button>
+        </section>
+
+        <!-- Piece 2 in action: Live formatted timer -->
+        <section>
+            <div id="secs" class="secs">00:15:00</div>
+        </section>
+
+        <!-- Piece 3: Quick Preset Selection (15m, 30m, 1h, 2h) -->
+        <section class="presets" id="presetsContainer" aria-label="Preset durations">
+            <button type="button" class="preset-chip active" data-minutes="15">15m</button>
+            <button type="button" class="preset-chip" data-minutes="30">30m</button>
+            <button type="button" class="preset-chip" data-minutes="60">1h</button>
+            <button type="button" class="preset-chip" data-minutes="120">2h</button>
+        </section>
+
+        <!-- Piece 8: Safeguards & Toggles -->
+        <section class="safeguard-box" aria-label="Safety Settings">
+            <label class="toggle-item">
+                <input type="checkbox" id="chkKeepDisplay" checked>
+                <span class="toggle-text">Keep Display On</span>
+            </label>
+            <label class="toggle-item">
+                <input type="checkbox" id="chkSafeguard" checked>
+                <span class="toggle-text">Battery Guard (5%)</span>
+            </label>
+            <label class="toggle-item">
+                <input type="checkbox" id="chkAutoLock">
+                <span class="toggle-text">Auto-Lock (Win + L)</span>
+            </label>
+            <button type="button" id="btnLockNow" class="btn-lock-now">🔒 Lock PC Now</button>
+        </section>
+
+        <!-- Piece 4: Interactive Toggle -->
+        <footer>
+            <button id="toggleBtn" class="btn-toggle">Start Awake</button>
+        </footer>
+    </main>
+
+    <script src="main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+# OS files
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Executables & Binaries
+*.exe
+*.exe~
+*.exe.bak
+*.dll
+*.so
+*.dylib
+*.lnk
+*.bak
+
+# Build outputs
+build/bin/
+**/dist/
+bin/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Logs & temp files
+*.log
+err.txt
+out.txt
+*.tmp
+
+# IDE / Editor local configs
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.user
