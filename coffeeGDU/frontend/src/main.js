@@ -284,12 +284,13 @@ app.innerHTML = `
       <button id="btnLockNow" class="lock-now-btn" title="Khóa ngay máy tính (Win + L)">
         🔒 Khóa Máy Ngay Lập Tức
       </button>
-    </div>
 
-    <!-- Dòng thông báo & bản quyền luôn ghim cố định ở đáy giao diện, không bị che khuất -->
-    <div id="toastNotice" class="toast-notice">
-      Tương thích hệ điều hành Windows Win32 API • Made with ❤️ for GDU
+      <!-- Dòng chữ bản quyền & hệ điều hành nằm gọn gàng bên trong khung chính -->
+      <div id="toastNotice" class="toast-notice">
+        Tương thích hệ điều hành Windows Win32 API • Made with ❤️ for GDU
+      </div>
     </div>
+  </div>
   </div>
 `;
 

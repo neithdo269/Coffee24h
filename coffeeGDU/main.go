@@ -31,7 +31,7 @@ func main() {
 	err := wails.Run(&options.App{
 		Title:             "Coffee24h ☕ GDU",
 		Width:             350,
-		Height:            370,
+		Height:            350,
 		MinWidth:          320,
 		MinHeight:         320,
 		DisableResize:     false,

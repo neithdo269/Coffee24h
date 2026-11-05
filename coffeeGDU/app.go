@@ -132,7 +132,7 @@ func (a *App) domReady(ctx context.Context) {
 
 		const (
 			winW   = 350
-			winH   = 370
+			winH   = 350
 			margin = 16
 			tbH    = 48 // Standard Windows taskbar height offset
 		)

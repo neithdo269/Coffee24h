@@ -58,10 +58,10 @@ body::-webkit-scrollbar {
 
 /* App Container - Square Layout (1:1 Aspect Ratio) */
 .app-container {
-  padding: 6px 10px 6px 10px;
+  padding: 6px 10px 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -569,7 +569,7 @@ body.eco-theme .steam-ring {
 .presets-bar {
   display: flex;
   gap: 3px;
-  margin-block-start: 3px;
+  margin-block-start: 4px;
   transition: var(--transition);
 }
 
@@ -578,8 +578,8 @@ body.eco-theme .steam-ring {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--gdu-border);
   border-radius: var(--radius-xs);
-  padding-block: 2.5px;
-  font-size: 9px;
+  padding-block: 3.5px;
+  font-size: 9.5px;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
@@ -604,10 +604,10 @@ body.eco-theme .steam-ring {
   background: var(--gdu-blue-card);
   border: 1px solid var(--gdu-border);
   border-radius: var(--radius-sm);
-  padding: 4px 8px 4px 8px;
+  padding: 5px 8px 5px 8px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -702,19 +702,16 @@ input:checked + .slider:before {
   color: #ffffff;
 }
 
-/* Notice at Footer - Always visible, pinned at bottom */
+/* Notice inside Main Frame */
 .toast-notice {
-  font-size: 8px;
+  font-size: 7.5px;
   text-align: center;
   color: var(--text-muted);
-  margin-top: auto;
-  padding: 2px 0 0 0;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
+  max-width: 100%;
   letter-spacing: 0.1px;
-  opacity: 0.9;
-  flex-shrink: 0;
-  z-index: 5;
+  opacity: 0.85;
 }
