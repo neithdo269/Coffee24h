@@ -729,7 +729,13 @@ input:checked + .slider:before {
   opacity: 0.85;
 }
 
-/* Scoped layout ONLY when Timed mode is selected, keeping "Vo Han" and "Chay Nen" 100% untouched */
+/* [ARCHITECTURE PATTERN: SCOPED ADAPTIVE LAYOUT]
+   Problem: In Timed mode, the presets bar (.presets-bar) expands with 5 time chips (+24px),
+   which previously caused the footer notice (#toastNotice) to be pushed outside the 350x350 window.
+   Solution: Rather than altering the global window height or changing the layout of 'Vo Han' and 'Chay Nen',
+   we scoped micro-spacing adjustments exclusively to ody.mode-timed.
+   This guarantees that 'Vo Han' and 'Chay Nen' remain 100% pristine, square, and untouched on laptop GL552VX,
+   while 'Hen Gio' seamlessly fits all chips and preserves the footer notice! */
 body.mode-timed .app-container {
   gap: 3px;
 }

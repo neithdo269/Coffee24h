@@ -566,6 +566,15 @@ document.querySelectorAll('.preset-chip').forEach((chip) => {
   });
 });
 
+// [ARCHITECTURE PATTERN: SINGLE SOURCE OF TRUTH & STATE RECONCILIATION]
+// Clean Code Principles:
+// 1. Immutable Configurations: EDITIONS and EDITION_CONFIGS are frozen via Object.freeze.
+// 2. Loose Coupling: UI badge ('GDU' ⇄ 'GDU student'), brand logo, tooltips, and themes
+//    are derived declaratively from state, preventing hardcoded string mismatches.
+// 3. Robust Normalization: normalizeEdition handles both current tokens and legacy aliases
+//    ('student', 'eco', 'lecturer', 'gdu') interchangeably.
+// 4. Bi-directional Sync: Clicking either the cup icon or the badge tag invokes toggleCupEdition(),
+//    instantly updating the DOM, audio chime, and notifying Go backend via App.SetCupEdition().
 // --- Cup Edition Switcher: GDU (Giảng Viên) ⇄ GDU student (Sinh Viên) ---
 const EDITIONS = Object.freeze({
   LECTURER: 'lecturer',

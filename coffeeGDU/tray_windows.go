@@ -489,8 +489,17 @@ func setWindowIcons(title string) {
 	applyWindowRoundedCorners(title, 350, 350)
 }
 
-// applyWindowRoundedCorners applies smooth hardware rounded corners on Windows 11+ via DWM
-// and clears any 1-bit GDI region clipping to preserve full sub-pixel anti-aliasing from WebView2.
+// [TROUBLESHOOTING LESSON: ANTI-ALIASED ROUNDED CORNERS VS 1-BIT GDI CLIPPING]
+// Root Cause of "Missing Pixels / Jagged Corners":
+// Classic Win32 SetWindowRgn(CreateRoundRectRgn) applies a 1-bit binary mask (0 or 1, no alpha).
+// When Chromium WebView2 renders a curved border with smooth sub-pixel alpha gradients, SetWindowRgn
+// brutally chops the edge at integer coordinates, producing harsh 1px stair-stepping jagged artifacts.
+//
+// The Modern Architecture Solution:
+// 1. procSetWindowRgn.Call(hwnd, 0, 1): Clears any 1-bit GDI region to prevent pixel truncation.
+// 2. DirectComposition in WebView2 renders true 32-bit ARGB with GPU sub-pixel antialiasing.
+// 3. Windows 11 DWM (Build 22000+): DwmSetWindowAttribute(DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2)
+//    adds official hardware-accelerated rounded corners.
 func applyWindowRoundedCorners(title string, width, height int) {
 	titlePtr, _ := syscall.UTF16PtrFromString(title)
 	hwnd, _, _ := procFindWindow.Call(0, uintptr(unsafe.Pointer(titlePtr)))
