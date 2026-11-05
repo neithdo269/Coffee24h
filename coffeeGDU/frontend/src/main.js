@@ -152,7 +152,7 @@ app.innerHTML = `
         </button>
         <h1 class="brand-title">
           <span id="txtTitle">Coffee24h</span>
-          <span id="editionTag" class="gdu-tag" title="Click để chuyển đổi phiên bản Giảng Viên ⇄ Sinh Viên">GDU</span>
+          <span id="editionTag" class="gdu-tag" title="Bấm để chuyển sang GDU student">GDU</span>
         </h1>
         <span id="txtSubtitle" style="display: none;"></span>
       </div>
@@ -393,6 +393,7 @@ function renderUI() {
 btnLang.addEventListener('click', () => {
   currentLang = currentLang === 'vi' ? 'en' : 'vi';
   updateLanguageTexts();
+  applyCupEdition(currentEdition, false);
   renderUI();
 });
 
@@ -531,52 +532,94 @@ document.querySelectorAll('.preset-chip').forEach((chip) => {
   });
 });
 
-// --- Cup Edition Switcher: GDU Blue Cup ⇄ Eco Recycle Leaf Cup ---
-let currentEdition = 'gdu';
+// --- Cup Edition Switcher: GDU (Giảng Viên) ⇄ GDU student (Sinh Viên) ---
+const EDITIONS = Object.freeze({
+  LECTURER: 'lecturer',
+  STUDENT: 'student'
+});
 
-function applyCupEdition(edition, announce = false) {
-  currentEdition = (edition === 'eco') ? 'eco' : 'gdu';
-  const isEco = currentEdition === 'eco';
+const EDITION_CONFIGS = Object.freeze({
+  [EDITIONS.LECTURER]: {
+    id: EDITIONS.LECTURER,
+    tagText: 'GDU',
+    tagClass: 'gdu-tag',
+    logo: coffeeLogo,
+    cupBtnClass: '',
+    tooltipVi: '☕ Phiên bản Giảng Viên (Tách Xanh Logo GDU) - Bấm để chuyển sang GDU student',
+    tooltipEn: '☕ Lecturer Edition (Blue Cup GDU Logo) - Click to switch to GDU student',
+    tagTitleVi: 'Bấm để chuyển sang GDU student',
+    tagTitleEn: 'Click to switch to GDU student',
+    toastVi: '☕ Đã chuyển sang GDU Giảng Viên (Tách Xanh Logo GDU)!',
+    toastEn: '☕ Switched to GDU Lecturer Edition (Blue Cup GDU Logo)!',
+    toastColor: 'var(--gdu-gold)'
+  },
+  [EDITIONS.STUDENT]: {
+    id: EDITIONS.STUDENT,
+    tagText: 'GDU student',
+    tagClass: 'eco-tag',
+    logo: ecoLogo,
+    cupBtnClass: 'eco',
+    tooltipVi: '🌱 Phiên bản Sinh Viên (Ly Tái Chế) - Bấm để chuyển sang GDU Giảng Viên',
+    tooltipEn: '🌱 Student Edition (Recycle Leaf Cup) - Click to switch to GDU Lecturer',
+    tagTitleVi: 'Bấm để chuyển sang GDU Giảng Viên',
+    tagTitleEn: 'Click to switch to GDU Lecturer',
+    toastVi: '🌱 Đã chuyển sang GDU Sinh Viên (Ly Tái Chế)!',
+    toastEn: '🌱 Switched to GDU Student Edition (Recycle Leaf Cup)!',
+    toastColor: 'var(--accent-emerald)'
+  }
+});
 
+function normalizeEdition(edition) {
+  const norm = String(edition || '').toLowerCase().trim();
+  return (norm === 'student' || norm === 'eco') ? EDITIONS.STUDENT : EDITIONS.LECTURER;
+}
+
+let currentEdition = EDITIONS.LECTURER;
+
+function applyCupEdition(rawEdition, announce = false) {
+  currentEdition = normalizeEdition(rawEdition);
+  const cfg = EDITION_CONFIGS[currentEdition];
+  const isStudent = currentEdition === EDITIONS.STUDENT;
+
+  // 1. Update Brand Cup Image
   if (brandCupImg) {
-    brandCupImg.src = isEco ? ecoLogo : coffeeLogo;
+    brandCupImg.src = cfg.logo;
   }
 
+  // 2. Update Interactive Cup Button
   if (btnCupToggle) {
-    btnCupToggle.className = `brand-cup-btn ${isEco ? 'eco' : ''} spin`;
-    btnCupToggle.title = isEco
-      ? (currentLang === 'vi' ? '🌱 Phiên bản GDU Sinh Viên (Ly Tái Chế) - Click để đổi sang Giảng Viên (Tách Xanh Logo GDU)' : '🌱 GDU Student Edition (Recycle Leaf Cup) - Click to switch to Lecturer (Blue Cup GDU Logo)')
-      : (currentLang === 'vi' ? '☕ Phiên bản GDU Giảng Viên (Tách Xanh Logo GDU) - Click để đổi sang Sinh Viên (Ly Tái Chế)' : '☕ GDU Lecturer Edition (Blue Cup GDU Logo) - Click to switch to Student (Recycle Leaf Cup)');
+    btnCupToggle.className = `brand-cup-btn ${cfg.cupBtnClass} spin`.trim();
+    btnCupToggle.title = currentLang === 'vi' ? cfg.tooltipVi : cfg.tooltipEn;
     setTimeout(() => {
       if (btnCupToggle) btnCupToggle.classList.remove('spin');
     }, 550);
   }
 
+  // 3. Update Edition Badge Tag: 'GDU' ⇄ 'GDU student'
   if (editionTag) {
-    editionTag.className = isEco ? 'eco-tag' : 'gdu-tag';
-    editionTag.textContent = 'GDU';
-    editionTag.title = isEco
-      ? (currentLang === 'vi' ? 'Phiên bản GDU Sinh Viên (Ly Tái Chế) - Click để đổi ly' : 'GDU Student Edition (Recycle Cup) - Click to switch')
-      : (currentLang === 'vi' ? 'Phiên bản GDU Giảng Viên (Tách Xanh Logo GDU) - Click để đổi ly' : 'GDU Lecturer Edition (Blue Cup GDU Logo) - Click to switch');
+    editionTag.className = cfg.tagClass;
+    editionTag.textContent = cfg.tagText;
+    editionTag.title = currentLang === 'vi' ? cfg.tagTitleVi : cfg.tagTitleEn;
   }
 
-  if (isEco) {
+  // 4. Update Global Body Theme
+  if (isStudent) {
     document.body.classList.add('eco-theme');
   } else {
     document.body.classList.remove('eco-theme');
   }
 
+  // 5. Persist choice in browser localStorage
   try {
     localStorage.setItem('coffee24h_cup_edition', currentEdition);
   } catch (e) {}
 
+  // 6. Sound & Toast Feedback
   if (announce) {
     playBatyTuongSound();
     if (toastNotice) {
-      toastNotice.textContent = isEco
-        ? (currentLang === 'vi' ? '🌱 Đã bật Ly Tái Chế (Phiên bản GDU Sinh Viên)!' : '🌱 Switched to GDU Student Edition (Recycle Leaf Cup)!')
-        : (currentLang === 'vi' ? '☕ Đã bật Tách Cà Phê Xanh Logo GDU (Phiên bản Giảng Viên)!' : '☕ Switched to GDU Lecturer Edition (Blue Cup GDU Logo)!');
-      toastNotice.style.color = isEco ? 'var(--accent-emerald)' : 'var(--gdu-gold)';
+      toastNotice.textContent = currentLang === 'vi' ? cfg.toastVi : cfg.toastEn;
+      toastNotice.style.color = cfg.toastColor;
       setTimeout(() => {
         if (toastNotice) {
           toastNotice.textContent = i18n[currentLang].footerNotice;
@@ -588,13 +631,14 @@ function applyCupEdition(edition, announce = false) {
 }
 
 function toggleCupEdition() {
-  const next = currentEdition === 'gdu' ? 'eco' : 'gdu';
+  const next = (currentEdition === EDITIONS.STUDENT) ? EDITIONS.LECTURER : EDITIONS.STUDENT;
   applyCupEdition(next, true);
   if (window.go && window.go.main && window.go.main.App && window.go.main.App.SetCupEdition) {
     window.go.main.App.SetCupEdition(next);
   }
 }
 
+// Click handlers: Both the Cup icon and the 'GDU' / 'GDU student' badge trigger seamless toggle
 if (btnCupToggle) {
   btnCupToggle.addEventListener('click', (e) => {
     e.stopPropagation();

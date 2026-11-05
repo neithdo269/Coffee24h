@@ -161,46 +161,64 @@ body::-webkit-scrollbar {
   animation: cupSpin 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* GDU University Badge (Default Blue/Red Flame) */
+/* GDU University Badge (Default Blue/Red Flame - Lecturer Edition) */
 .gdu-tag {
   background: linear-gradient(135deg, var(--gdu-red-flame) 0%, #b91c1c 100%);
   color: #ffffff;
-  font-size: 8px;
+  font-size: 8.5px;
   font-weight: 800;
-  padding: 1px 5px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
   border: 1px solid rgba(245, 158, 11, 0.45);
   letter-spacing: 0.5px;
   box-shadow: 0 1px 4px var(--gdu-red-glow);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: var(--transition);
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .gdu-tag:hover {
-  transform: scale(1.08);
+  transform: translateY(-1px) scale(1.06);
   border-color: var(--gdu-gold);
+  box-shadow: 0 2px 8px var(--gdu-gold-glow);
 }
 
-/* Eco Recycle Student Badge (Emerald/Green Flame) */
+.gdu-tag:active {
+  transform: translateY(0) scale(0.94);
+}
+
+/* Eco Recycle Student Badge (Emerald Green - Student Edition) */
 .eco-tag {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
-  font-size: 8px;
+  font-size: 8.5px;
   font-weight: 800;
-  padding: 1px 5px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
   border: 1px solid rgba(52, 211, 153, 0.6);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   box-shadow: 0 1px 6px rgba(16, 185, 129, 0.5);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: var(--transition);
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .eco-tag:hover {
-  transform: scale(1.08);
-  box-shadow: 0 1px 8px rgba(52, 211, 153, 0.8);
+  transform: translateY(-1px) scale(1.06);
+  box-shadow: 0 2px 10px rgba(52, 211, 153, 0.8);
+  border-color: #a7f3d0;
+}
+
+.eco-tag:active {
+  transform: translateY(0) scale(0.94);
 }
 
 /* Eco Student Theme Accents */
