@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -17,8 +18,14 @@ func (a *App) CalculateSeconds(minutes int) int {
 	return minutes * 60
 }
 
-// SetCupEdition switches between "gdu" (Classic Blue Package Cup) and "eco" (Student Recycle Leaf Cup)
+// SetCupEdition switches between "lecturer" (Blue Cup with GDU Logo) and "student" (Recycle Leaf Cup)
 func (a *App) SetCupEdition(edition string) string {
+	switch strings.ToLower(edition) {
+	case "student", "eco":
+		edition = "student"
+	default:
+		edition = "lecturer"
+	}
 	switchCupIcon(edition)
 	if a.ctx != nil {
 		runtime.EventsEmit(a.ctx, "cup_edition_changed", edition)
@@ -29,7 +36,7 @@ func (a *App) SetCupEdition(edition string) string {
 // GetCupEdition returns active cup edition
 func (a *App) GetCupEdition() string {
 	if a.cliOpts.EcoCup {
-		return "eco"
+		return "student"
 	}
 	return currentCupEdition
 }
@@ -233,6 +240,12 @@ func (a *App) StartAwake(mode string, keepDisplay bool, durationMinutes int, bat
 	defer a.mu.Unlock()//Unlock "Fn" the mutex to prevent race condition
 
 	// Zero-Trust input defense: sanitize and clamp values
+	switch mode {
+	case "until_off", "timed", "system_only":
+	default:
+		mode = "until_off"
+	}
+
 	if durationMinutes < 0 {
 		durationMinutes = 0
 	}
@@ -290,17 +303,36 @@ func (a *App) StopAwake() AwakeState {
 	return a.state
 }
 
-// ToggleAwake toggles awake state with default until-off settings
+// ToggleAwake atomically toggles awake state with default until-off settings
 func (a *App) ToggleAwake() AwakeState {
 	a.mu.Lock()
-	isCurrentlyAwake := a.state.IsAwake
-	a.mu.Unlock()
+	defer a.mu.Unlock()
 
-	if isCurrentlyAwake {
-		return a.StopAwake()
+	if a.state.IsAwake {
+		_ = a.inhibitor.Release()
+		a.stopTimerLocked()
+		a.state.IsAwake = false
+		a.state.SecondsLeft = 0
+		a.state.TargetSeconds = 0
+		a.state.Battery = getPlatformBatteryInfo()
+		updateTrayStatus(false)
+		runtime.EventsEmit(a.ctx, "state_updated", a.state)
+		return a.state
 	}
-	st, _ := a.StartAwake("until_off", true, 0, true, 5, false)
-	return st
+
+	_ = a.inhibitor.Inhibit(true)
+	a.state.IsAwake = true
+	a.state.Mode = "until_off"
+	a.state.KeepDisplay = true
+	a.state.BatteryGuard = true
+	a.state.SafeguardPct = 5
+	a.state.AutoLockOnEnd = false
+	a.state.TargetSeconds = 0
+	a.state.SecondsLeft = 0
+	a.state.Battery = getPlatformBatteryInfo()
+	updateTrayStatus(true)
+	runtime.EventsEmit(a.ctx, "state_updated", a.state)
+	return a.state
 }
 
 func (a *App) startTimerLocked() {
@@ -326,6 +358,7 @@ func (a *App) startTimerLocked() {
 					_ = a.inhibitor.Release()
 					a.state.IsAwake = false
 					a.state.SecondsLeft = 0
+					a.stopTimerLocked()
 					updateTrayStatus(false)
 					PlaySystemSound(0x40) // Information / Chime sound
 					if a.state.AutoLockOnEnd {

@@ -9,6 +9,7 @@
 package main
 
 import (
+	"runtime"
 	"syscall"
 	"unsafe"
 )
@@ -39,12 +40,40 @@ type SYSTEM_POWER_STATUS struct {
 	BatteryFullLifeTime uint32
 }
 
+type stateReq struct {
+	flags  uintptr
+	resErr chan error
+}
+
 type WindowsInhibitor struct {
 	isActive bool
+	reqChan  chan stateReq
 }
 
 func newPlatformInhibitor() PlatformInhibitor {
-	return &WindowsInhibitor{}
+	w := &WindowsInhibitor{
+		reqChan: make(chan stateReq),
+	}
+
+	// [SECURITY & WIN32 AFFINITY: DEDICATED OS-LOCKED EXECUTION THREAD]
+	// In Win32, SetThreadExecutionState is strictly thread-local.
+	// If executed from an arbitrary Go goroutine, the OS thread can be parked
+	// or terminated by Go's M:N scheduler, resetting the keep-awake state unexpectedly.
+	// Locking this dedicated goroutine to a single OS thread guarantees 100% stable execution.
+	go func() {
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+		for req := range w.reqChan {
+			r1, _, err := procSetThreadExecState.Call(req.flags)
+			if r1 == 0 {
+				req.resErr <- err
+			} else {
+				req.resErr <- nil
+			}
+		}
+	}()
+
+	return w
 }
 
 func (w *WindowsInhibitor) Inhibit(keepDisplay bool) error {
@@ -53,21 +82,23 @@ func (w *WindowsInhibitor) Inhibit(keepDisplay bool) error {
 		flags |= ES_DISPLAY_REQUIRED
 	}
 
-	r1, _, err := procSetThreadExecState.Call(flags)
-	if r1 == 0 {
-		return err
+	res := make(chan error, 1)
+	w.reqChan <- stateReq{flags: flags, resErr: res}
+	err := <-res
+	if err == nil {
+		w.isActive = true
 	}
-	w.isActive = true
-	return nil
+	return err
 }
 
 func (w *WindowsInhibitor) Release() error {
-	r1, _, err := procSetThreadExecState.Call(ES_CONTINUOUS)
-	if r1 == 0 {
-		return err
+	res := make(chan error, 1)
+	w.reqChan <- stateReq{flags: ES_CONTINUOUS, resErr: res}
+	err := <-res
+	if err == nil {
+		w.isActive = false
 	}
-	w.isActive = false
-	return nil
+	return err
 }
 
 func (w *WindowsInhibitor) IsActive() bool {

@@ -328,7 +328,7 @@ function updateLanguageTexts() {
   descSafeguard.textContent = t.safeguardDesc;
   lblAutoLock.textContent = t.autoLock;
   descAutoLock.textContent = t.autoLockDesc;
-  btnLockNow.innerHTML = t.lockNowBtn;
+  btnLockNow.textContent = t.lockNowBtn;
   toastNotice.textContent = t.footerNotice;
 }
 

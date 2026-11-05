@@ -237,7 +237,9 @@ function Install-PowerShellProfile {
 
     $aliasCode = "`r`n# >>> Coffee24h Keep-Awake Shortcuts >>>`r`nfunction coffee { & `"$ExePath`" @args }`r`nfunction c24 { & `"$ExePath`" @args }`r`n# <<< Coffee24h Keep-Awake Shortcuts <<<`r`n"
 
-    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction SilentlyContinue
+    try {
+        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction SilentlyContinue
+    } catch {}
     $profileText = Get-Content $PROFILE -Raw -ErrorAction SilentlyContinue
     if ($profileText -notlike "*Coffee24h Keep-Awake Shortcuts*") {
         Add-Content -Path $PROFILE -Value $aliasCode
