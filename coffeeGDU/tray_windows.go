@@ -145,9 +145,9 @@ func loadTrayIcon(hInstance uintptr) uintptr {
 
 	// 1. Try loading custom tray icon files if present
 	iconCandidates := []string{
-		"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
 		"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
 		"build\\windows\\icon.ico",
+		"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
 		"icon.ico",
 	}
 

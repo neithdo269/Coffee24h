@@ -1,5 +1,5 @@
 import './style.css';
-import coffeeLogo from './assets/images/coffee-leafcup.png';
+import coffeeLogo from './assets/images/coffee-logo.png';
 
 // Bilingual Dictionary (Tiếng Việt & English)
 const i18n = {
