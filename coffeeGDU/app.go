@@ -72,6 +72,7 @@ func (a *App) startup(ctx context.Context) {
 
 // domReady anchors the window at the bottom-right corner of the primary screen above the taskbar.
 func (a *App) domReady(ctx context.Context) {
+	setWindowIcons("Coffee24h ☕ GDU")
 	screens, err := runtime.ScreenGetAll(ctx)
 	if err == nil && len(screens) > 0 {
 		primary := screens[0]

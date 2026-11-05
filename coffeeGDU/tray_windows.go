@@ -62,6 +62,8 @@ var (
 	procDestroyMenu         = user32DLL.NewProc("DestroyMenu")
 	procLoadIcon            = user32DLL.NewProc("LoadIconW")
 	procLoadImage           = user32DLL.NewProc("LoadImageW")
+	procFindWindow          = user32DLL.NewProc("FindWindowW")
+	procSendMessage         = user32DLL.NewProc("SendMessageW")
 
 	kernel32DLL           = syscall.NewLazyDLL("kernel32.dll")
 	procGetModuleHandle   = kernel32DLL.NewProc("GetModuleHandleW")
@@ -347,5 +349,22 @@ func removeTray() {
 	procDestroyWindow.Call(trayHwnd)
 	trayCreated = false
 	trayHwnd = 0
+}
+
+func setWindowIcons(title string) {
+	titlePtr, _ := syscall.UTF16PtrFromString(title)
+	hwnd, _, _ := procFindWindow.Call(0, uintptr(unsafe.Pointer(titlePtr)))
+	if hwnd == 0 {
+		return
+	}
+	const (
+		WM_SETICON = 0x0080
+		ICON_SMALL = 0
+		ICON_BIG   = 1
+	)
+	if trayHIcon != 0 {
+		procSendMessage.Call(hwnd, WM_SETICON, ICON_SMALL, trayHIcon)
+		procSendMessage.Call(hwnd, WM_SETICON, ICON_BIG, trayHIcon)
+	}
 }
 

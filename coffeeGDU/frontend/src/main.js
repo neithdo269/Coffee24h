@@ -1,4 +1,5 @@
 import './style.css';
+import coffeeLogo from './assets/images/coffee-leafcup.png';
 
 // Bilingual Dictionary (Tiếng Việt & English)
 const i18n = {
@@ -145,7 +146,7 @@ app.innerHTML = `
     <!-- Header: Clean GDU Transparent Glass Title Bar (No text overlap, No side bar) -->
     <header class="app-header">
       <div class="brand">
-        <img src="/src/assets/images/logo-universal.png" alt="Coffee24h" style="width: 22px; height: 22px; border-radius: 4px; object-fit: contain; margin-right: 4px;" />
+        <img src="${coffeeLogo}" alt="Coffee24h" style="width: 24px; height: 24px; border-radius: 4px; object-fit: contain; margin-right: 6px;" />
         <h1 class="brand-title"><span id="txtTitle">Coffee24h</span><span class="gdu-tag">GDU</span></h1>
         <span id="txtSubtitle" style="display: none;"></span>
       </div>

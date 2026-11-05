@@ -1,0 +1,52 @@
+{
+  "RT_GROUP_ICON": {
+    "APP": {
+      "0000": ["icon.png"]
+    },
+    "#1": {
+      "0000": ["icon.png"]
+    },
+    "#3": {
+      "0000": ["icon.png"]
+    }
+  },
+  "RT_MANIFEST": {
+    "#1": {
+      "0409": {
+        "identity": {
+          "name": "coffee24h",
+          "version": "1.0.0.0"
+        },
+        "description": "Coffee24h - Keep Awake Utility for GDU",
+        "minimum-os": "win7",
+        "execution-level": "as invoker",
+        "ui-access": false,
+        "auto-elevate": false,
+        "dpi-awareness": "system",
+        "use-common-controls-v6": true
+      }
+    }
+  },
+  "RT_VERSION": {
+    "#1": {
+      "0000": {
+        "fixed": {
+          "file_version": "1.0.0.0",
+          "product_version": "1.0.0.0"
+        },
+        "info": {
+          "0409": {
+            "CompanyName": "Gia Dinh University (GDU)",
+            "FileDescription": "Coffee24h - Cross-Platform Keep-Awake Utility for GDU",
+            "FileVersion": "1.0.0.0",
+            "InternalName": "coffee24h",
+            "LegalCopyright": "Copyright (c) 2026 Neith Do - GDU Open License",
+            "OriginalFilename": "coffee24h.exe",
+            "ProductName": "Coffee24h",
+            "ProductVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  }
+}
