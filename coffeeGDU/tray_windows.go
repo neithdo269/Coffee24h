@@ -480,3 +480,34 @@ func setWindowIcons(title string) {
 	}
 }
 
+// showTrayNotification displays a native Windows system tray balloon notification
+func showTrayNotification(title, message string) {
+	trayMu.Lock()
+	defer trayMu.Unlock()
+
+	if !trayCreated || trayHwnd == 0 {
+		return
+	}
+
+	const (
+		nifInfo  = 0x00000010
+		niifInfo = 0x00000001
+	)
+
+	var nid NOTIFYICONDATAW
+	nid.CbSize = uint32(unsafe.Sizeof(nid))
+	nid.HWnd = trayHwnd
+	nid.UID = 1
+	nid.UFlags = nifInfo
+	nid.DwInfoFlags = niifInfo
+
+	titleUtf16, _ := syscall.UTF16FromString(title)
+	copy(nid.SzInfoTitle[:], titleUtf16)
+
+	msgUtf16, _ := syscall.UTF16FromString(message)
+	copy(nid.SzInfo[:], msgUtf16)
+
+	procShellNotifyIcon.Call(uintptr(NIM_MODIFY), uintptr(unsafe.Pointer(&nid)))
+}
+
+

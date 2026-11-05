@@ -197,6 +197,7 @@ func (a *App) statusLoop() {
 					a.stopTimerLocked()
 					updateTrayStatus(false)
 					PlaySystemSound(0x10) // Critical Stop / Alert sound
+					showTrayNotification("Coffee24h ⚠️", fmt.Sprintf("Pin còn %d%%! Đã tự động tắt Awake để bảo vệ pin.", a.state.Battery.Percentage))
 					// SECURITY PATTERN: Zero-Trust Auto-Lock & Telemetry Alert
 					// Prevents unauthorized physical access when unattended battery depletion occurs.
 					if a.state.AutoLockOnEnd {
@@ -361,6 +362,7 @@ func (a *App) startTimerLocked() {
 					a.stopTimerLocked()
 					updateTrayStatus(false)
 					PlaySystemSound(0x40) // Information / Chime sound
+					showTrayNotification("Coffee24h ⏰", "Đã hết giờ hẹn! Máy tính trở về chế độ nghỉ bình thường.")
 					if a.state.AutoLockOnEnd {
 						_ = LockScreen()
 					}

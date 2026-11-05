@@ -140,6 +140,35 @@ function playSleepRestSound() {
   }
 }
 
+// Pleasant 3-Tone Melody when Timed Session Finishes (E5 -> G5 -> C6 Bell Chime)
+function playTimerFinishedSound() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+
+    const notes = [659.25, 783.99, 1046.50]; // E5, G5, C6
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      const startTime = ctx.currentTime + idx * 0.12;
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.2, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.55);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + 0.6);
+    });
+  } catch (e) {
+    // Silent fallback
+  }
+}
+
 // Setup App HTML
 const app = document.querySelector('#app');
 app.innerHTML = `
@@ -665,13 +694,28 @@ if (window.runtime) {
   });
 
   window.runtime.EventsOn('safeguard_triggered', (msg) => {
+    playSleepRestSound();
     toastNotice.textContent = `⚠️ ${msg}`;
     toastNotice.style.color = 'var(--accent-amber)';
+    setTimeout(() => {
+      if (toastNotice) {
+        toastNotice.textContent = i18n[currentLang].footerNotice;
+        toastNotice.style.color = '';
+      }
+    }, 5000);
   });
 
   window.runtime.EventsOn('timer_finished', (msg) => {
-    toastNotice.textContent = `⏰ ${msg}`;
+    playTimerFinishedSound();
+    const isVi = currentLang === 'vi';
+    toastNotice.textContent = isVi ? '⏰ Đã hết thời gian hẹn giờ!' : `⏰ ${msg}`;
     toastNotice.style.color = 'var(--accent-emerald)';
+    setTimeout(() => {
+      if (toastNotice) {
+        toastNotice.textContent = i18n[currentLang].footerNotice;
+        toastNotice.style.color = '';
+      }
+    }, 5000);
   });
 }
 
