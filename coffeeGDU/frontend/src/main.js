@@ -1,5 +1,6 @@
 import './style.css';
 import coffeeLogo from './assets/images/coffee-logo.png';
+import ecoLogo from './assets/images/coffee-leafcup.png';
 
 // Bilingual Dictionary (Tiếng Việt & English)
 const i18n = {
@@ -146,8 +147,13 @@ app.innerHTML = `
     <!-- Header: Clean GDU Transparent Glass Title Bar (No text overlap, No side bar) -->
     <header class="app-header">
       <div class="brand">
-        <img src="${coffeeLogo}" alt="Coffee24h" style="width: 24px; height: 24px; border-radius: 4px; object-fit: contain; margin-right: 6px;" />
-        <h1 class="brand-title"><span id="txtTitle">Coffee24h</span><span class="gdu-tag">GDU</span></h1>
+        <button id="btnCupToggle" class="brand-cup-btn" title="Chuyển đổi phiên bản Ly / Switch Cup: GDU Blue Cup ⇄ Eco Recycle Leaf Cup (Sinh Viên)">
+          <img id="brandCupImg" class="brand-cup-img" src="${coffeeLogo}" alt="Coffee24h Cup" />
+        </button>
+        <h1 class="brand-title">
+          <span id="txtTitle">Coffee24h</span>
+          <span id="editionTag" class="gdu-tag" title="Click để chuyển đổi ly giữa GDU Blue Cup và Eco Recycle Leaf Cup">GDU</span>
+        </h1>
         <span id="txtSubtitle" style="display: none;"></span>
       </div>
       <div class="window-controls">
@@ -277,6 +283,9 @@ const btnLang = document.getElementById('btnLang');
 const btnWinMin = document.getElementById('btnWinMin');
 const btnWinClose = document.getElementById('btnWinClose');
 const toastNotice = document.getElementById('toastNotice');
+const btnCupToggle = document.getElementById('btnCupToggle');
+const brandCupImg = document.getElementById('brandCupImg');
+const editionTag = document.getElementById('editionTag');
 
 const txtTitle = document.getElementById('txtTitle');
 const txtSubtitle = document.getElementById('txtSubtitle');
@@ -522,11 +531,93 @@ document.querySelectorAll('.preset-chip').forEach((chip) => {
   });
 });
 
+// --- Cup Edition Switcher: GDU Blue Cup ⇄ Eco Recycle Leaf Cup ---
+let currentEdition = 'gdu';
+
+function applyCupEdition(edition, announce = false) {
+  currentEdition = (edition === 'eco') ? 'eco' : 'gdu';
+  const isEco = currentEdition === 'eco';
+
+  if (brandCupImg) {
+    brandCupImg.src = isEco ? ecoLogo : coffeeLogo;
+  }
+
+  if (btnCupToggle) {
+    btnCupToggle.className = `brand-cup-btn ${isEco ? 'eco' : ''} spin`;
+    btnCupToggle.title = isEco
+      ? (currentLang === 'vi' ? '🌱 Ly Tái Chế Eco (Sinh Viên) - Click để đổi về Ly GDU Gốc' : '🌱 Eco Student Leaf Cup - Click to switch to Classic GDU Cup')
+      : (currentLang === 'vi' ? '☕ Ly GDU Gốc - Click để đổi sang Ly Tái Chế Eco (Sinh Viên)' : '☕ Classic GDU Cup - Click to switch to Eco Student Cup');
+    setTimeout(() => {
+      if (btnCupToggle) btnCupToggle.classList.remove('spin');
+    }, 550);
+  }
+
+  if (editionTag) {
+    editionTag.className = isEco ? 'eco-tag' : 'gdu-tag';
+    editionTag.textContent = isEco ? 'ECO 🌱' : 'GDU';
+    editionTag.title = isEco
+      ? (currentLang === 'vi' ? 'Phiên bản Eco Sinh Viên - Click để đổi ly' : 'Eco Student Edition - Click to switch')
+      : (currentLang === 'vi' ? 'Phiên bản GDU Gốc - Click để đổi ly' : 'GDU Classic Edition - Click to switch');
+  }
+
+  if (isEco) {
+    document.body.classList.add('eco-theme');
+  } else {
+    document.body.classList.remove('eco-theme');
+  }
+
+  try {
+    localStorage.setItem('coffee24h_cup_edition', currentEdition);
+  } catch (e) {}
+
+  if (announce) {
+    playBatyTuongSound();
+    if (toastNotice) {
+      toastNotice.textContent = isEco
+        ? (currentLang === 'vi' ? '🌱 Đã bật Ly Tái Chế Eco (Phiên bản Sinh Viên GDU)!' : '🌱 Switched to Eco Recycle Leaf Cup (Student Edition)!')
+        : (currentLang === 'vi' ? '☕ Đã bật Ly Cà Phê GDU Gốc!' : '☕ Switched to Classic GDU Coffee Cup!');
+      toastNotice.style.color = isEco ? 'var(--accent-emerald)' : 'var(--gdu-gold)';
+      setTimeout(() => {
+        if (toastNotice) {
+          toastNotice.textContent = i18n[currentLang].footerNotice;
+          toastNotice.style.color = '';
+        }
+      }, 3200);
+    }
+  }
+}
+
+function toggleCupEdition() {
+  const next = currentEdition === 'gdu' ? 'eco' : 'gdu';
+  applyCupEdition(next, true);
+  if (window.go && window.go.main && window.go.main.App && window.go.main.App.SetCupEdition) {
+    window.go.main.App.SetCupEdition(next);
+  }
+}
+
+if (btnCupToggle) {
+  btnCupToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleCupEdition();
+  });
+}
+
+if (editionTag) {
+  editionTag.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleCupEdition();
+  });
+}
+
 // Listen to backend events if Wails runtime is loaded
 if (window.runtime) {
   window.runtime.EventsOn('state_updated', (updatedState) => {
     state = updatedState;
     renderUI();
+  });
+
+  window.runtime.EventsOn('cup_edition_changed', (edition) => {
+    applyCupEdition(edition, false);
   });
 
   window.runtime.EventsOn('safeguard_triggered', (msg) => {
@@ -543,13 +634,27 @@ if (window.runtime) {
 // Initial state fetch from Go backend
 async function init() {
   updateLanguageTexts();
+
+  let initialEdition = 'gdu';
+  try {
+    initialEdition = localStorage.getItem('coffee24h_cup_edition') || 'gdu';
+  } catch (e) {}
+
   if (window.go && window.go.main && window.go.main.App) {
     try {
+      if (window.go.main.App.GetCupEdition) {
+        const backendEdition = await window.go.main.App.GetCupEdition();
+        if (backendEdition) {
+          initialEdition = backendEdition;
+        }
+      }
       state = await window.go.main.App.GetState();
     } catch (e) {
       console.warn('Backend not ready yet:', e);
     }
   }
+
+  applyCupEdition(initialEdition, false);
   renderUI();
 }
 

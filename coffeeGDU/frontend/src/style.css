@@ -114,18 +114,108 @@ body::-webkit-scrollbar {
   gap: 4px;
 }
 
-/* GDU University Badge */
+/* Interactive Cup Edition Switcher in Header */
+.brand-cup-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0 6px 0 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+  user-select: none;
+}
+
+.brand-cup-btn:hover {
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.7));
+}
+
+.brand-cup-btn.eco:hover {
+  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.8));
+}
+
+.brand-cup-btn:active {
+  transform: scale(0.9);
+}
+
+.brand-cup-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: contain;
+  display: block;
+}
+
+@keyframes cupSpin {
+  0% { transform: scale(0.8) rotate(0deg); }
+  50% { transform: scale(1.25) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
+}
+
+.brand-cup-btn.spin {
+  animation: cupSpin 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* GDU University Badge (Default Blue/Red Flame) */
 .gdu-tag {
   background: linear-gradient(135deg, var(--gdu-red-flame) 0%, #b91c1c 100%);
   color: #ffffff;
   font-size: 8px;
   font-weight: 800;
-  padding: 1px 4px;
+  padding: 1px 5px;
   border-radius: 3px;
   border: 1px solid rgba(245, 158, 11, 0.45);
   letter-spacing: 0.5px;
   box-shadow: 0 1px 4px var(--gdu-red-glow);
   white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.gdu-tag:hover {
+  transform: scale(1.08);
+  border-color: var(--gdu-gold);
+}
+
+/* Eco Recycle Student Badge (Emerald/Green Flame) */
+.eco-tag {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(52, 211, 153, 0.6);
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 6px rgba(16, 185, 129, 0.5);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.eco-tag:hover {
+  transform: scale(1.08);
+  box-shadow: 0 1px 8px rgba(52, 211, 153, 0.8);
+}
+
+/* Eco Student Theme Accents */
+body.eco-theme .hero-toggle-card.awake {
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 12px 36px rgba(16, 185, 129, 0.22);
+}
+
+body.eco-theme .main-toggle-btn.awake {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.65);
+}
+
+body.eco-theme .steam-ring {
+  border-color: rgba(52, 211, 153, 0.35);
 }
 
 /* Hero Card Header Row (Language & Battery inside Main Frame) */

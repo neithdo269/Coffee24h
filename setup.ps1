@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Coffee24h Multi-Setup Manager
 .DESCRIPTION
@@ -17,6 +17,7 @@ param(
     [switch]$Cli,
     [switch]$Startup,
     [switch]$DesktopShortcut,
+    [switch]$EcoShortcut,
     [switch]$StartMenu,
     [switch]$RunDialog,
     [switch]$PowerShellProfile,
@@ -41,6 +42,10 @@ $ExePath = Join-Path $BinDir "coffee24h.exe"
 $IconPath = Join-Path $BinDir "CoffeeGDU icons\Coffee-24h-GDU-64Gperpackage-icon.ico"
 if (-not (Test-Path $IconPath)) {
     $IconPath = Join-Path $BinDir "build\windows\icon.ico"
+}
+$EcoIconPath = Join-Path $BinDir "CoffeeGDU icons\Coffee-icon-leafCup.ico"
+if (-not (Test-Path $EcoIconPath)) {
+    $EcoIconPath = $IconPath
 }
 
 function Show-Header {
@@ -112,6 +117,41 @@ function Install-DesktopShortcut {
     $shortcut.Description = "Coffee24h - Keep-Awake Utility for GDU"
     $shortcut.Save()
     Write-Host "  [+] Desktop shortcut created at $shortcutPath" -ForegroundColor Green
+}
+
+# --- Action 3B: Eco Student Edition Shortcut (Recycle Leaf Cup) ---
+function Install-EcoShortcut {
+    Write-Host "[*] Creating Student Eco Edition Shortcut (Recycle Leaf Cup)..." -ForegroundColor Yellow
+    $desktopDir = [Environment]::GetFolderPath('Desktop')
+    $shortcutPath = Join-Path $desktopDir "Coffee24h (Eco Student Edition).lnk"
+
+    $wsh = New-Object -ComObject WScript.Shell
+    $shortcut = $wsh.CreateShortcut($shortcutPath)
+    $shortcut.TargetPath = $ExePath
+    $shortcut.Arguments = "--eco"
+    if (Test-Path $EcoIconPath) {
+        $shortcut.IconLocation = "$EcoIconPath, 0"
+    } elseif (Test-Path $IconPath) {
+        $shortcut.IconLocation = "$IconPath, 0"
+    }
+    $shortcut.WorkingDirectory = $BinDir
+    $shortcut.Description = "Coffee24h (Eco Student Edition) - Recycle Leaf Cup Keep-Awake for GDU"
+    $shortcut.Save()
+    Write-Host "  [+] Student Eco shortcut created at $shortcutPath" -ForegroundColor Green
+
+    # Also register in Start Menu
+    $startMenuPrograms = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs"
+    $startEcoPath = Join-Path $startMenuPrograms "Coffee24h (Eco Student Edition).lnk"
+    $sc2 = $wsh.CreateShortcut($startEcoPath)
+    $sc2.TargetPath = $ExePath
+    $sc2.Arguments = "--eco"
+    if (Test-Path $EcoIconPath) {
+        $sc2.IconLocation = "$EcoIconPath, 0"
+    }
+    $sc2.WorkingDirectory = $BinDir
+    $sc2.Description = "Coffee24h (Eco Student Edition) - Recycle Leaf Cup Keep-Awake for GDU"
+    $sc2.Save()
+    Write-Host "  [+] Start Menu shortcut created: 'Coffee24h (Eco Student Edition)'" -ForegroundColor Green
 }
 
 # --- Action 4: Start Menu Shortcut ---
@@ -188,6 +228,18 @@ function Uninstall-All {
         Write-Host "  [-] Removed Start Menu shortcut." -ForegroundColor DarkYellow
     }
 
+    # Remove Eco Student Shortcuts
+    $ecoShortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) "Coffee24h (Eco Student Edition).lnk"
+    if (Test-Path $ecoShortcut) {
+        Remove-Item $ecoShortcut -Force
+        Write-Host "  [-] Removed Eco Student Desktop shortcut." -ForegroundColor DarkYellow
+    }
+    $ecoStart = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs\Coffee24h (Eco Student Edition).lnk"
+    if (Test-Path $ecoStart) {
+        Remove-Item $ecoStart -Force
+        Write-Host "  [-] Removed Eco Student Start Menu shortcut." -ForegroundColor DarkYellow
+    }
+
     # Remove Run Dialog key
     $appPathsKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\App Paths\coffee24h.exe"
     if (Test-Path $appPathsKey) {
@@ -212,11 +264,12 @@ if ($All) {
     Install-CliSetup
     Install-Startup
     Install-DesktopShortcut
+    Install-EcoShortcut
     Install-StartMenu
     Install-RunDialog
     Install-PowerShellProfile
     Write-Host ""
-    Write-Host " All 6 setups completed successfully!" -ForegroundColor Green
+    Write-Host " All setups completed successfully!" -ForegroundColor Green
     exit 0
 }
 
@@ -226,11 +279,12 @@ if ($Uninstall) {
     exit 0
 }
 
-if ($Cli -or $Startup -or $DesktopShortcut -or $StartMenu -or $RunDialog -or $PowerShellProfile) {
+if ($Cli -or $Startup -or $DesktopShortcut -or $EcoShortcut -or $StartMenu -or $RunDialog -or $PowerShellProfile) {
     Show-Header
     if ($Cli) { Install-CliSetup }
     if ($Startup) { Install-Startup }
     if ($DesktopShortcut) { Install-DesktopShortcut }
+    if ($EcoShortcut) { Install-EcoShortcut }
     if ($StartMenu) { Install-StartMenu }
     if ($RunDialog) { Install-RunDialog }
     if ($PowerShellProfile) { Install-PowerShellProfile }
@@ -243,18 +297,19 @@ if ($Cli -or $Startup -or $DesktopShortcut -or $StartMenu -or $RunDialog -or $Po
 Show-Header
 Write-Host "Select an option to configure:" -ForegroundColor White
 Write-Host ""
-Write-Host "  [1]  Full Setup (All Recommended Setups in 1-Click)" -ForegroundColor Green
+Write-Host "  [1]  Full Setup (All Setups + Both GDU & Eco Student Shortcuts)" -ForegroundColor Green
 Write-Host "  [2]  Terminal CLI Setup (Add to PATH & WinGet Links)" -ForegroundColor White
 Write-Host "  [3]  Auto-Start on Windows Login (Silent to System Tray)" -ForegroundColor White
-Write-Host "  [4]  Create Desktop Shortcut (Custom GDU Icon)" -ForegroundColor White
-Write-Host "  [5]  Create Start Menu Shortcut (Windows Searchable)" -ForegroundColor White
-Write-Host "  [6]  Win + R Run Dialog ('coffee24h')" -ForegroundColor White
-Write-Host "  [7]  PowerShell Profile Aliases ('coffee', 'c24')" -ForegroundColor White
-Write-Host "  [8]  Remove / Uninstall All Integrations" -ForegroundColor DarkYellow
+Write-Host "  [4]  Create Classic Desktop Shortcut (GDU 64G Cup)" -ForegroundColor White
+Write-Host "  [5]  Create Student Eco Shortcut (Recycle Leaf Cup Edition)" -ForegroundColor Green
+Write-Host "  [6]  Create Start Menu Shortcut (Windows Searchable)" -ForegroundColor White
+Write-Host "  [7]  Win + R Run Dialog ('coffee24h')" -ForegroundColor White
+Write-Host "  [8]  PowerShell Profile Aliases ('coffee', 'c24')" -ForegroundColor White
+Write-Host "  [9]  Remove / Uninstall All Integrations" -ForegroundColor DarkYellow
 Write-Host "  [Q]  Quit" -ForegroundColor DarkGray
 Write-Host ""
 
-$choice = Read-Host "Enter your choice (1-8 or Q)"
+$choice = Read-Host "Enter your choice (1-9 or Q)"
 Write-Host ""
 
 switch ($choice) {
@@ -262,18 +317,20 @@ switch ($choice) {
         Install-CliSetup
         Install-Startup
         Install-DesktopShortcut
+        Install-EcoShortcut
         Install-StartMenu
         Install-RunDialog
         Install-PowerShellProfile
-        Write-Host "`n All 6 setups completed successfully!" -ForegroundColor Green
+        Write-Host "`n All setups completed successfully!" -ForegroundColor Green
     }
     "2" { Install-CliSetup }
     "3" { Install-Startup }
     "4" { Install-DesktopShortcut }
-    "5" { Install-StartMenu }
-    "6" { Install-RunDialog }
-    "7" { Install-PowerShellProfile }
-    "8" { Uninstall-All }
+    "5" { Install-EcoShortcut }
+    "6" { Install-StartMenu }
+    "7" { Install-RunDialog }
+    "8" { Install-PowerShellProfile }
+    "9" { Uninstall-All }
     "Q" { Write-Host "Goodbye!" -ForegroundColor DarkGray; exit 0 }
     default { Write-Host "Invalid choice." -ForegroundColor Red }
 }

@@ -4,6 +4,8 @@ package main
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 	"unsafe"
@@ -120,11 +122,12 @@ type MSG struct {
 }
 
 var (
-	trayApp     *App
-	trayHwnd    uintptr
-	trayHIcon   uintptr
-	trayMu      sync.Mutex
-	trayCreated bool
+	trayApp           *App
+	trayHwnd          uintptr
+	trayHIcon         uintptr
+	currentCupEdition = "gdu"
+	trayMu            sync.Mutex
+	trayCreated       bool
 )
 
 func initTray(a *App) {
@@ -139,21 +142,45 @@ func initTray(a *App) {
 	go runTrayMessageLoop()
 }
 
-func loadTrayIcon(hInstance uintptr) uintptr {
+func resolveAssetPath(rel string) string {
+	if _, err := os.Stat(rel); err == nil {
+		return rel
+	}
+	var exePathBuf [260]uint16
+	procGetModuleFileName.Call(0, uintptr(unsafe.Pointer(&exePathBuf[0])), 260)
+	exeDir := filepath.Dir(syscall.UTF16ToString(exePathBuf[:]))
+	candidate := filepath.Join(exeDir, rel)
+	if _, err := os.Stat(candidate); err == nil {
+		return candidate
+	}
+	return ""
+}
+
+func loadCupHIcon(hInstance uintptr, edition string) uintptr {
 	const IMAGE_ICON = 1
 	const LR_LOADFROMFILE = 0x00000010
 
-	// 1. Try loading custom tray icon files if present
-	iconCandidates := []string{
-		"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
-		"build\\windows\\icon.ico",
-		"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
-		"icon.ico",
+	var candidates []string
+	if edition == "eco" {
+		candidates = []string{
+			"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
+			"Coffee-icon-leafCup.ico",
+			"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
+			"build\\windows\\icon.ico",
+		}
+	} else {
+		candidates = []string{
+			"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
+			"Coffee-24h-GDU-64Gperpackage-icon.ico",
+			"build\\windows\\icon.ico",
+			"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
+		}
 	}
 
-	for _, p := range iconCandidates {
-		if _, err := os.Stat(p); err == nil {
-			pathPtr, _ := syscall.UTF16PtrFromString(p)
+	for _, p := range candidates {
+		resolved := resolveAssetPath(p)
+		if resolved != "" {
+			pathPtr, _ := syscall.UTF16PtrFromString(resolved)
 			hIcon, _, _ := procLoadImage.Call(0, uintptr(unsafe.Pointer(pathPtr)), IMAGE_ICON, 16, 16, LR_LOADFROMFILE)
 			if hIcon != 0 {
 				return hIcon
@@ -161,7 +188,7 @@ func loadTrayIcon(hInstance uintptr) uintptr {
 		}
 	}
 
-	// 2. Try extracting embedded main icon from the running .exe
+	// Try extracting embedded main icon from the running .exe
 	var exePathBuf [260]uint16
 	procGetModuleFileName.Call(0, uintptr(unsafe.Pointer(&exePathBuf[0])), 260)
 	hIcon, _, _ := procExtractIcon.Call(hInstance, uintptr(unsafe.Pointer(&exePathBuf[0])), 0)
@@ -169,9 +196,49 @@ func loadTrayIcon(hInstance uintptr) uintptr {
 		return hIcon
 	}
 
-	// 3. Fallback to standard application icon
+	// Fallback to standard application icon
 	hIcon, _, _ = procLoadIcon.Call(0, uintptr(IDI_APPLICATION))
 	return hIcon
+}
+
+func loadTrayIcon(hInstance uintptr) uintptr {
+	edition := "gdu"
+	if trayApp != nil && trayApp.cliOpts.EcoCup {
+		edition = "eco"
+	}
+	currentCupEdition = edition
+	return loadCupHIcon(hInstance, edition)
+}
+
+func switchCupIcon(edition string) {
+	trayMu.Lock()
+	defer trayMu.Unlock()
+
+	edition = strings.ToLower(edition)
+	if edition != "eco" && edition != "gdu" {
+		edition = "gdu"
+	}
+	currentCupEdition = edition
+
+	hInstance, _, _ := procGetModuleHandle.Call(0)
+	newHIcon := loadCupHIcon(hInstance, edition)
+	if newHIcon != 0 {
+		trayHIcon = newHIcon
+	}
+
+	// Update window taskbar/titlebar icon
+	setWindowIcons("Coffee24h ☕ GDU")
+
+	// Update System Tray icon if created
+	if trayCreated && trayHwnd != 0 && trayHIcon != 0 {
+		var nid NOTIFYICONDATAW
+		nid.CbSize = uint32(unsafe.Sizeof(nid))
+		nid.HWnd = trayHwnd
+		nid.UID = 1
+		nid.UFlags = NIF_ICON
+		nid.HIcon = trayHIcon
+		procShellNotifyIcon.Call(uintptr(NIM_MODIFY), uintptr(unsafe.Pointer(&nid)))
+	}
 }
 
 func runTrayMessageLoop() {
@@ -320,10 +387,14 @@ func updateTrayStatus(isAwake bool) {
 	nid.UFlags = NIF_TIP
 
 	var tipText string
+	prefix := "Coffee24h"
+	if currentCupEdition == "eco" {
+		prefix = "Coffee24h (Eco Student)"
+	}
 	if isAwake {
-		tipText = "Coffee24h: Đang giữ máy thức (Awake)"
+		tipText = prefix + ": Đang giữ máy thức (Awake)"
 	} else {
-		tipText = "Coffee24h: Cho phép nghỉ (Sleep Allowed)"
+		tipText = prefix + ": Cho phép nghỉ (Sleep Allowed)"
 	}
 
 	tip, _ := syscall.UTF16FromString(tipText)

@@ -17,6 +17,23 @@ func (a *App) CalculateSeconds(minutes int) int {
 	return minutes * 60
 }
 
+// SetCupEdition switches between "gdu" (Classic Blue Package Cup) and "eco" (Student Recycle Leaf Cup)
+func (a *App) SetCupEdition(edition string) string {
+	switchCupIcon(edition)
+	if a.ctx != nil {
+		runtime.EventsEmit(a.ctx, "cup_edition_changed", edition)
+	}
+	return edition
+}
+
+// GetCupEdition returns active cup edition
+func (a *App) GetCupEdition() string {
+	if a.cliOpts.EcoCup {
+		return "eco"
+	}
+	return currentCupEdition
+}
+
 // AwakeState is passed to the frontend
 type AwakeState struct {
 	IsAwake       bool        `json:"isAwake"`
@@ -90,7 +107,12 @@ func (a *App) startup(ctx context.Context) {
 
 // domReady anchors the window at the bottom-right corner of the primary screen above the taskbar.
 func (a *App) domReady(ctx context.Context) {
-	setWindowIcons("Coffee24h ☕ GDU")
+	if a.cliOpts.EcoCup {
+		switchCupIcon("eco")
+		runtime.EventsEmit(ctx, "cup_edition_changed", "eco")
+	} else {
+		setWindowIcons("Coffee24h ☕ GDU")
+	}
 	screens, err := runtime.ScreenGetAll(ctx)
 	if err == nil && len(screens) > 0 {
 		primary := screens[0]
