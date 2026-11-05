@@ -150,7 +150,7 @@ app.innerHTML = `
         <span id="txtSubtitle" style="display: none;"></span>
       </div>
       <div class="window-controls">
-        <button id="btnWinMin" class="win-btn win-min" title="Thu nhỏ / Minimize">−</button>
+        <button id="btnWinMin" class="win-btn win-min" title="Thu nhỏ vào khay hệ thống / Minimize to tray">−</button>
         <button id="btnWinClose" class="win-btn win-close" title="Đóng vào khay / Close to tray">✕</button>
       </div>
     </header>
@@ -386,14 +386,14 @@ btnLang.addEventListener('click', () => {
   renderUI();
 });
 
-// Window controls: Minimize & Close to tray
+// Window controls: Minimize & Close to tray ("Show hidden icons")
 if (btnWinMin) {
   btnWinMin.addEventListener('click', (e) => {
     e.stopPropagation();
     if (window.go && window.go.main && window.go.main.App && window.go.main.App.MinimizeWindow) {
       window.go.main.App.MinimizeWindow();
-    } else if (window.runtime && window.runtime.WindowMinimise) {
-      window.runtime.WindowMinimise();
+    } else if (window.runtime && window.runtime.WindowHide) {
+      window.runtime.WindowHide();
     }
   });
 }

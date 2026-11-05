@@ -158,6 +158,11 @@ func (a *App) statusLoop() {
 				}
 			}
 
+			// If window was minimized via OS shortcut, hide it to system tray
+			if a.ctx != nil && runtime.WindowIsMinimised(a.ctx) {
+				runtime.WindowHide(a.ctx)
+			}
+
 			runtime.EventsEmit(a.ctx, "state_updated", a.state)
 			a.mu.Unlock()
 		}
@@ -315,10 +320,10 @@ func (a *App) LockWorkstation() error {
 	return LockScreen()
 }
 
-// MinimizeWindow minimizes the application window to the taskbar
+// MinimizeWindow hides the application window to the system tray ("Show hidden icons")
 func (a *App) MinimizeWindow() {
 	if a.ctx != nil {
-		runtime.WindowMinimise(a.ctx)
+		runtime.WindowHide(a.ctx)
 	}
 }
 
