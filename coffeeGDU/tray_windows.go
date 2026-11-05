@@ -489,8 +489,8 @@ func setWindowIcons(title string) {
 	applyWindowRoundedCorners(title, 350, 350)
 }
 
-// applyWindowRoundedCorners removes the 4 sharp corners of the application window on Windows.
-// Uses Windows 11 DWM hardware corner rounding and universal Win32 GDI Region clipping on Windows 10/8/7.
+// applyWindowRoundedCorners applies smooth hardware rounded corners on Windows 11+ via DWM
+// and clears any 1-bit GDI region clipping to preserve full sub-pixel anti-aliasing from WebView2.
 func applyWindowRoundedCorners(title string, width, height int) {
 	titlePtr, _ := syscall.UTF16PtrFromString(title)
 	hwnd, _, _ := procFindWindow.Call(0, uintptr(unsafe.Pointer(titlePtr)))
@@ -498,19 +498,15 @@ func applyWindowRoundedCorners(title string, width, height int) {
 		return
 	}
 
-	// 1. Windows 11 DWM rounded corners (DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2)
+	// 1. Clear any legacy 1-bit GDI window region so Chromium WebView2 renders anti-aliased subpixel curves without jagged/missing pixels
+	if procSetWindowRgn.Find() == nil {
+		procSetWindowRgn.Call(hwnd, 0, 1)
+	}
+
+	// 2. Windows 11 DWM hardware anti-aliased rounded corners (DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2)
 	if procDwmSetWindowAttribute.Find() == nil {
 		var preference uint32 = 2 // DWMWCP_ROUND
 		_, _, _ = procDwmSetWindowAttribute.Call(hwnd, 33, uintptr(unsafe.Pointer(&preference)), 4)
-	}
-
-	// 2. Universal Win32 Region Clipping (Windows 10, 8, 7): Mask native window frame to smooth rounded rectangle
-	if procCreateRoundRectRgn.Find() == nil && procSetWindowRgn.Find() == nil {
-		// 28x28 ellipse yields a 14px smooth corner radius matching CSS border-radius: 14px
-		hrgn, _, _ := procCreateRoundRectRgn.Call(0, 0, uintptr(width+1), uintptr(height+1), 28, 28)
-		if hrgn != 0 {
-			procSetWindowRgn.Call(hwnd, hrgn, 1)
-		}
 	}
 }
 
