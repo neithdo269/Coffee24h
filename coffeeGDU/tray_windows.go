@@ -68,6 +68,13 @@ var (
 	procFindWindow          = user32DLL.NewProc("FindWindowW")
 	procSendMessage         = user32DLL.NewProc("SendMessageW")
 	procRegisterWindowMessage = user32DLL.NewProc("RegisterWindowMessageW")
+	procSetWindowRgn          = user32DLL.NewProc("SetWindowRgn")
+
+	gdi32DLL               = syscall.NewLazyDLL("gdi32.dll")
+	procCreateRoundRectRgn = gdi32DLL.NewProc("CreateRoundRectRgn")
+
+	dwmapiDLL                 = syscall.NewLazyDLL("dwmapi.dll")
+	procDwmSetWindowAttribute = dwmapiDLL.NewProc("DwmSetWindowAttribute")
 
 	kernel32DLL           = syscall.NewLazyDLL("kernel32.dll")
 	procGetModuleHandle   = kernel32DLL.NewProc("GetModuleHandleW")
@@ -477,6 +484,33 @@ func setWindowIcons(title string) {
 	if trayHIcon != 0 {
 		procSendMessage.Call(hwnd, WM_SETICON, ICON_SMALL, trayHIcon)
 		procSendMessage.Call(hwnd, WM_SETICON, ICON_BIG, trayHIcon)
+	}
+
+	applyWindowRoundedCorners(title, 350, 350)
+}
+
+// applyWindowRoundedCorners removes the 4 sharp corners of the application window on Windows.
+// Uses Windows 11 DWM hardware corner rounding and universal Win32 GDI Region clipping on Windows 10/8/7.
+func applyWindowRoundedCorners(title string, width, height int) {
+	titlePtr, _ := syscall.UTF16PtrFromString(title)
+	hwnd, _, _ := procFindWindow.Call(0, uintptr(unsafe.Pointer(titlePtr)))
+	if hwnd == 0 {
+		return
+	}
+
+	// 1. Windows 11 DWM rounded corners (DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2)
+	if procDwmSetWindowAttribute.Find() == nil {
+		var preference uint32 = 2 // DWMWCP_ROUND
+		_, _, _ = procDwmSetWindowAttribute.Call(hwnd, 33, uintptr(unsafe.Pointer(&preference)), 4)
+	}
+
+	// 2. Universal Win32 Region Clipping (Windows 10, 8, 7): Mask native window frame to smooth rounded rectangle
+	if procCreateRoundRectRgn.Find() == nil && procSetWindowRgn.Find() == nil {
+		// 28x28 ellipse yields a 14px smooth corner radius matching CSS border-radius: 14px
+		hrgn, _, _ := procCreateRoundRectRgn.Call(0, 0, uintptr(width+1), uintptr(height+1), 28, 28)
+		if hrgn != 0 {
+			procSetWindowRgn.Call(hwnd, hrgn, 1)
+		}
 	}
 }
 

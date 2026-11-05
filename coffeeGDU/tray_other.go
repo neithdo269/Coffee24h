@@ -11,3 +11,4 @@ func setWindowIcons(title string) {}
 func switchCupIcon(edition string) {}
 func showTrayNotification(title, message string) {}
 
+func applyWindowRoundedCorners(title string, width, height int) {}
