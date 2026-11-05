@@ -17,6 +17,7 @@ param(
     [switch]$Cli,
     [switch]$Startup,
     [switch]$DesktopShortcut,
+    [switch]$StudentShortcut,
     [switch]$EcoShortcut,
     [switch]$StartMenu,
     [switch]$RunDialog,
@@ -39,14 +40,17 @@ if (Test-Path (Join-Path $ScriptDir "coffeeGDU\coffee24h.exe")) {
 }
 
 $ExePath = Join-Path $BinDir "coffee24h.exe"
-$IconPath = Join-Path $BinDir "CoffeeGDU icons\Coffee-24h-GDU-64Gperpackage-icon.ico"
-if (-not (Test-Path $IconPath)) {
-    $IconPath = Join-Path $BinDir "build\windows\icon.ico"
+$LecturerIconPath = Join-Path $BinDir "CoffeeGDU icons\Coffee-24h-GDU-BlueCup-Lecturer.ico"
+if (-not (Test-Path $LecturerIconPath)) {
+    $LecturerIconPath = Join-Path $BinDir "build\windows\icon.ico"
 }
-$EcoIconPath = Join-Path $BinDir "CoffeeGDU icons\Coffee-icon-leafCup.ico"
-if (-not (Test-Path $EcoIconPath)) {
-    $EcoIconPath = $IconPath
+$IconPath = $LecturerIconPath
+
+$StudentIconPath = Join-Path $BinDir "CoffeeGDU icons\Coffee-icon-leafCup.ico"
+if (-not (Test-Path $StudentIconPath)) {
+    $StudentIconPath = $IconPath
 }
+$EcoIconPath = $StudentIconPath
 
 function Show-Header {
     Write-Host "==============================================================" -ForegroundColor Cyan
@@ -101,75 +105,111 @@ function Remove-Startup {
     Write-Host "  [-] Removed Coffee24h from Windows Startup." -ForegroundColor DarkYellow
 }
 
-# --- Action 3: Desktop Shortcut ---
+# --- Action 3: Desktop Shortcuts (Lecturer & Student) ---
 function Install-DesktopShortcut {
-    Write-Host "[*] 3. Creating Desktop Shortcut..." -ForegroundColor Yellow
+    Write-Host "[*] 3. Creating Lecturer Desktop Shortcut (Blue Cup GDU Logo)..." -ForegroundColor Yellow
     $desktopDir = [Environment]::GetFolderPath('Desktop')
-    $shortcutPath = Join-Path $desktopDir "Coffee24h.lnk"
-
+    
     $wsh = New-Object -ComObject WScript.Shell
+    
+    # 1. Coffee24h for Lecturer.lnk
+    $shortcutPath = Join-Path $desktopDir "Coffee24h for Lecturer.lnk"
     $shortcut = $wsh.CreateShortcut($shortcutPath)
     $shortcut.TargetPath = $ExePath
-    if (Test-Path $IconPath) {
-        $shortcut.IconLocation = "$IconPath, 0"
+    if (Test-Path $LecturerIconPath) {
+        $shortcut.IconLocation = "$LecturerIconPath, 0"
     }
     $shortcut.WorkingDirectory = $BinDir
-    $shortcut.Description = "Coffee24h - Keep-Awake Utility for GDU"
+    $shortcut.Description = "Coffee24h for Lecturer - Blue Cup with GDU Logo Keep-Awake"
     $shortcut.Save()
-    Write-Host "  [+] Desktop shortcut created at $shortcutPath" -ForegroundColor Green
+    Write-Host "  [+] Lecturer shortcut created: $shortcutPath" -ForegroundColor Green
+
+    # Also keep standard Coffee24h.lnk pointing to Lecturer
+    $stdPath = Join-Path $desktopDir "Coffee24h.lnk"
+    $stdSc = $wsh.CreateShortcut($stdPath)
+    $stdSc.TargetPath = $ExePath
+    if (Test-Path $LecturerIconPath) {
+        $stdSc.IconLocation = "$LecturerIconPath, 0"
+    }
+    $stdSc.WorkingDirectory = $BinDir
+    $stdSc.Description = "Coffee24h for Lecturer - Blue Cup with GDU Logo Keep-Awake"
+    $stdSc.Save()
 }
 
-# --- Action 3B: Eco Student Edition Shortcut (Recycle Leaf Cup) ---
-function Install-EcoShortcut {
-    Write-Host "[*] Creating Student Eco Edition Shortcut (Recycle Leaf Cup)..." -ForegroundColor Yellow
+# --- Action 3B: Student Edition Shortcut (Recycle Leaf Cup) ---
+function Install-StudentShortcut {
+    Write-Host "[*] Creating Student Edition Shortcut (Recycle Leaf Cup)..." -ForegroundColor Yellow
     $desktopDir = [Environment]::GetFolderPath('Desktop')
-    $shortcutPath = Join-Path $desktopDir "Coffee24h (Eco Student Edition).lnk"
+    $shortcutPath = Join-Path $desktopDir "Coffee24h for Student.lnk"
 
     $wsh = New-Object -ComObject WScript.Shell
     $shortcut = $wsh.CreateShortcut($shortcutPath)
     $shortcut.TargetPath = $ExePath
-    $shortcut.Arguments = "--eco"
-    if (Test-Path $EcoIconPath) {
-        $shortcut.IconLocation = "$EcoIconPath, 0"
+    $shortcut.Arguments = "--student"
+    if (Test-Path $StudentIconPath) {
+        $shortcut.IconLocation = "$StudentIconPath, 0"
     } elseif (Test-Path $IconPath) {
         $shortcut.IconLocation = "$IconPath, 0"
     }
     $shortcut.WorkingDirectory = $BinDir
-    $shortcut.Description = "Coffee24h (Eco Student Edition) - Recycle Leaf Cup Keep-Awake for GDU"
+    $shortcut.Description = "Coffee24h for Student - Recycle Leaf Cup Keep-Awake for GDU"
     $shortcut.Save()
-    Write-Host "  [+] Student Eco shortcut created at $shortcutPath" -ForegroundColor Green
+    Write-Host "  [+] Student shortcut created: $shortcutPath" -ForegroundColor Green
+
+    # Remove any old Eco-named shortcut if present
+    $oldEco = Join-Path $desktopDir "Coffee24h (Eco Student Edition).lnk"
+    if (Test-Path $oldEco) {
+        Remove-Item $oldEco -Force -ErrorAction SilentlyContinue
+    }
 
     # Also register in Start Menu
     $startMenuPrograms = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs"
-    $startEcoPath = Join-Path $startMenuPrograms "Coffee24h (Eco Student Edition).lnk"
-    $sc2 = $wsh.CreateShortcut($startEcoPath)
+    $startStudentPath = Join-Path $startMenuPrograms "Coffee24h for Student.lnk"
+    $sc2 = $wsh.CreateShortcut($startStudentPath)
     $sc2.TargetPath = $ExePath
-    $sc2.Arguments = "--eco"
-    if (Test-Path $EcoIconPath) {
-        $sc2.IconLocation = "$EcoIconPath, 0"
+    $sc2.Arguments = "--student"
+    if (Test-Path $StudentIconPath) {
+        $sc2.IconLocation = "$StudentIconPath, 0"
     }
     $sc2.WorkingDirectory = $BinDir
-    $sc2.Description = "Coffee24h (Eco Student Edition) - Recycle Leaf Cup Keep-Awake for GDU"
+    $sc2.Description = "Coffee24h for Student - Recycle Leaf Cup Keep-Awake for GDU"
     $sc2.Save()
-    Write-Host "  [+] Start Menu shortcut created: 'Coffee24h (Eco Student Edition)'" -ForegroundColor Green
+    Write-Host "  [+] Start Menu shortcut created: 'Coffee24h for Student'" -ForegroundColor Green
 }
 
-# --- Action 4: Start Menu Shortcut ---
-function Install-StartMenu {
-    Write-Host "[*] 4. Creating Start Menu Shortcut..." -ForegroundColor Yellow
-    $startMenuPrograms = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs"
-    $shortcutPath = Join-Path $startMenuPrograms "Coffee24h.lnk"
+function Install-EcoShortcut {
+    Install-StudentShortcut
+}
 
+# --- Action 4: Start Menu Shortcuts ---
+function Install-StartMenu {
+    Write-Host "[*] 4. Creating Start Menu Shortcuts..." -ForegroundColor Yellow
+    $startMenuPrograms = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs"
+    
     $wsh = New-Object -ComObject WScript.Shell
+    
+    # Lecturer shortcut
+    $shortcutPath = Join-Path $startMenuPrograms "Coffee24h for Lecturer.lnk"
     $shortcut = $wsh.CreateShortcut($shortcutPath)
     $shortcut.TargetPath = $ExePath
-    if (Test-Path $IconPath) {
-        $shortcut.IconLocation = "$IconPath, 0"
+    if (Test-Path $LecturerIconPath) {
+        $shortcut.IconLocation = "$LecturerIconPath, 0"
     }
     $shortcut.WorkingDirectory = $BinDir
-    $shortcut.Description = "Coffee24h - Keep-Awake Utility for GDU"
+    $shortcut.Description = "Coffee24h for Lecturer - Blue Cup with GDU Logo Keep-Awake"
     $shortcut.Save()
-    Write-Host "  [+] Start Menu shortcut created: searchable as 'Coffee24h' in Windows search." -ForegroundColor Green
+
+    # Standard alias
+    $stdPath = Join-Path $startMenuPrograms "Coffee24h.lnk"
+    $stdSc = $wsh.CreateShortcut($stdPath)
+    $stdSc.TargetPath = $ExePath
+    if (Test-Path $LecturerIconPath) {
+        $stdSc.IconLocation = "$LecturerIconPath, 0"
+    }
+    $stdSc.WorkingDirectory = $BinDir
+    $stdSc.Save()
+
+    Write-Host "  [+] Start Menu shortcuts created: searchable as 'Coffee24h' or 'Coffee24h for Lecturer'" -ForegroundColor Green
 }
 
 # --- Action 5: Run Dialog (Win + R) ---
@@ -221,23 +261,22 @@ function Uninstall-All {
         Write-Host "  [-] Removed Desktop shortcut." -ForegroundColor DarkYellow
     }
 
-    # Remove Start Menu Shortcut
-    $startMenuShortcut = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs\Coffee24h.lnk"
-    if (Test-Path $startMenuShortcut) {
-        Remove-Item $startMenuShortcut -Force
-        Write-Host "  [-] Removed Start Menu shortcut." -ForegroundColor DarkYellow
+    # Remove Shortcuts from Desktop
+    @("Coffee24h.lnk", "Coffee24h for Lecturer.lnk", "Coffee24h for Student.lnk", "Coffee24h (Eco Student Edition).lnk") | ForEach-Object {
+        $p = Join-Path ([Environment]::GetFolderPath('Desktop')) $_
+        if (Test-Path $p) {
+            Remove-Item $p -Force
+            Write-Host "  [-] Removed Desktop shortcut: $_" -ForegroundColor DarkYellow
+        }
     }
 
-    # Remove Eco Student Shortcuts
-    $ecoShortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) "Coffee24h (Eco Student Edition).lnk"
-    if (Test-Path $ecoShortcut) {
-        Remove-Item $ecoShortcut -Force
-        Write-Host "  [-] Removed Eco Student Desktop shortcut." -ForegroundColor DarkYellow
-    }
-    $ecoStart = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs\Coffee24h (Eco Student Edition).lnk"
-    if (Test-Path $ecoStart) {
-        Remove-Item $ecoStart -Force
-        Write-Host "  [-] Removed Eco Student Start Menu shortcut." -ForegroundColor DarkYellow
+    # Remove Shortcuts from Start Menu
+    @("Coffee24h.lnk", "Coffee24h for Lecturer.lnk", "Coffee24h for Student.lnk", "Coffee24h (Eco Student Edition).lnk") | ForEach-Object {
+        $p = Join-Path ([Environment]::GetFolderPath('StartMenu')) "Programs\$_"
+        if (Test-Path $p) {
+            Remove-Item $p -Force
+            Write-Host "  [-] Removed Start Menu shortcut: $_" -ForegroundColor DarkYellow
+        }
     }
 
     # Remove Run Dialog key
@@ -264,7 +303,7 @@ if ($All) {
     Install-CliSetup
     Install-Startup
     Install-DesktopShortcut
-    Install-EcoShortcut
+    Install-StudentShortcut
     Install-StartMenu
     Install-RunDialog
     Install-PowerShellProfile
@@ -279,12 +318,12 @@ if ($Uninstall) {
     exit 0
 }
 
-if ($Cli -or $Startup -or $DesktopShortcut -or $EcoShortcut -or $StartMenu -or $RunDialog -or $PowerShellProfile) {
+if ($Cli -or $Startup -or $DesktopShortcut -or $StudentShortcut -or $EcoShortcut -or $StartMenu -or $RunDialog -or $PowerShellProfile) {
     Show-Header
     if ($Cli) { Install-CliSetup }
     if ($Startup) { Install-Startup }
     if ($DesktopShortcut) { Install-DesktopShortcut }
-    if ($EcoShortcut) { Install-EcoShortcut }
+    if ($StudentShortcut -or $EcoShortcut) { Install-StudentShortcut }
     if ($StartMenu) { Install-StartMenu }
     if ($RunDialog) { Install-RunDialog }
     if ($PowerShellProfile) { Install-PowerShellProfile }
@@ -297,12 +336,12 @@ if ($Cli -or $Startup -or $DesktopShortcut -or $EcoShortcut -or $StartMenu -or $
 Show-Header
 Write-Host "Select an option to configure:" -ForegroundColor White
 Write-Host ""
-Write-Host "  [1]  Full Setup (All Setups + Both GDU & Eco Student Shortcuts)" -ForegroundColor Green
+Write-Host "  [1]  Full Setup (All Setups + Both Lecturer & Student Shortcuts)" -ForegroundColor Green
 Write-Host "  [2]  Terminal CLI Setup (Add to PATH & WinGet Links)" -ForegroundColor White
 Write-Host "  [3]  Auto-Start on Windows Login (Silent to System Tray)" -ForegroundColor White
-Write-Host "  [4]  Create Classic Desktop Shortcut (GDU 64G Cup)" -ForegroundColor White
-Write-Host "  [5]  Create Student Eco Shortcut (Recycle Leaf Cup Edition)" -ForegroundColor Green
-Write-Host "  [6]  Create Start Menu Shortcut (Windows Searchable)" -ForegroundColor White
+Write-Host "  [4]  Create Lecturer Shortcut (Blue Cup with GDU Logo)" -ForegroundColor White
+Write-Host "  [5]  Create Student Shortcut (Recycle Leaf Cup Edition)" -ForegroundColor Green
+Write-Host "  [6]  Create Start Menu Shortcuts (Windows Searchable)" -ForegroundColor White
 Write-Host "  [7]  Win + R Run Dialog ('coffee24h')" -ForegroundColor White
 Write-Host "  [8]  PowerShell Profile Aliases ('coffee', 'c24')" -ForegroundColor White
 Write-Host "  [9]  Remove / Uninstall All Integrations" -ForegroundColor DarkYellow
@@ -317,7 +356,7 @@ switch ($choice) {
         Install-CliSetup
         Install-Startup
         Install-DesktopShortcut
-        Install-EcoShortcut
+        Install-StudentShortcut
         Install-StartMenu
         Install-RunDialog
         Install-PowerShellProfile
@@ -326,7 +365,7 @@ switch ($choice) {
     "2" { Install-CliSetup }
     "3" { Install-Startup }
     "4" { Install-DesktopShortcut }
-    "5" { Install-EcoShortcut }
+    "5" { Install-StudentShortcut }
     "6" { Install-StartMenu }
     "7" { Install-RunDialog }
     "8" { Install-PowerShellProfile }

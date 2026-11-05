@@ -40,8 +40,10 @@ func parseCLI() CLIOptions {
 			opts.NoSafeguard = true
 		case arg == "--autolock" || arg == "--lock" || arg == "-l":
 			opts.AutoLock = true
-		case arg == "-e" || arg == "--eco" || arg == "--leaf" || arg == "--recycle" || arg == "--student":
+		case arg == "-e" || arg == "--student" || arg == "--recycle" || arg == "--leaf" || arg == "--eco":
 			opts.EcoCup = true
+		case arg == "--lecturer" || arg == "--teacher" || arg == "--gdu":
+			opts.EcoCup = false
 		case arg == "-t" || arg == "--time" || arg == "--duration":
 			if i+1 < len(os.Args) {
 				opts.TimedMin = parseDuration(os.Args[i+1])
@@ -100,19 +102,20 @@ func printHelp() {
     -v, --version         Show application version
     -m, --tray            Start directly minimized into System Tray ("Show hidden icons")
     -a, --awake           Immediately activate Keep-Awake mode upon launch
-    -e, --eco             Trigger Eco Student Edition (Recycle Leaf Cup)
+    -e, --student         Trigger GDU Student Edition (Recycle Leaf Cup)
+    --lecturer            Trigger GDU Lecturer Edition (Blue Cup with GDU Logo)
     -t, --time <dur>      Start a timed session (e.g. 15m, 30m, 1h, 2h, 4h)
     -s, --system-only     Keep CPU/downloads awake with display sleep enabled
     -l, --autolock        Auto-lock workstation (Win + L) when session expires
     --no-safeguard        Disable battery safeguard (<5% auto-stop)
 
   EXAMPLES:
-    coffee24h                    # Launch GUI normally (Default GDU Blue Cup)
-    coffee24h --eco              # Launch in Eco Student Edition (Recycle Leaf Cup)
+    coffee24h                    # Launch GUI normally (Lecturer Blue Cup with GDU Logo)
+    coffee24h --student          # Launch in GDU Student Edition (Recycle Leaf Cup)
     coffee24h --tray             # Start silently in "Show hidden icons"
     coffee24h --awake            # Launch and immediately keep laptop awake
     coffee24h --time 2h          # Keep awake for 2 hours with timer
-    coffee24h -e --time 1h       # Eco Student session for 1 hour
+    coffee24h -e --time 1h       # Student session for 1 hour
 `
 	fmt.Println(msg)
 }

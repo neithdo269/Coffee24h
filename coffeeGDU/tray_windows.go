@@ -161,18 +161,19 @@ func loadCupHIcon(hInstance uintptr, edition string) uintptr {
 	const LR_LOADFROMFILE = 0x00000010
 
 	var candidates []string
-	if edition == "eco" {
+	if edition == "eco" || edition == "student" {
 		candidates = []string{
 			"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
 			"Coffee-icon-leafCup.ico",
-			"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
+			"CoffeeGDU icons\\Coffee-24h-GDU-BlueCup-Lecturer.ico",
 			"build\\windows\\icon.ico",
 		}
 	} else {
 		candidates = []string{
-			"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
-			"Coffee-24h-GDU-64Gperpackage-icon.ico",
+			"CoffeeGDU icons\\Coffee-24h-GDU-BlueCup-Lecturer.ico",
+			"Coffee-24h-GDU-BlueCup-Lecturer.ico",
 			"build\\windows\\icon.ico",
+			"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
 			"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
 		}
 	}
@@ -387,9 +388,9 @@ func updateTrayStatus(isAwake bool) {
 	nid.UFlags = NIF_TIP
 
 	var tipText string
-	prefix := "Coffee24h"
-	if currentCupEdition == "eco" {
-		prefix = "Coffee24h (Eco Student)"
+	prefix := "Coffee24h (GDU Giảng Viên)"
+	if currentCupEdition == "eco" || currentCupEdition == "student" {
+		prefix = "Coffee24h (GDU Sinh Viên)"
 	}
 	if isAwake {
 		tipText = prefix + ": Đang giữ máy thức (Awake)"

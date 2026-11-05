@@ -147,12 +147,12 @@ app.innerHTML = `
     <!-- Header: Clean GDU Transparent Glass Title Bar (No text overlap, No side bar) -->
     <header class="app-header">
       <div class="brand">
-        <button id="btnCupToggle" class="brand-cup-btn" title="Chuyển đổi phiên bản Ly / Switch Cup: GDU Blue Cup ⇄ Eco Recycle Leaf Cup (Sinh Viên)">
+        <button id="btnCupToggle" class="brand-cup-btn" title="Chuyển đổi phiên bản: GDU Giảng Viên (Tách Xanh Logo GDU) ⇄ GDU Sinh Viên (Ly Tái Chế)">
           <img id="brandCupImg" class="brand-cup-img" src="${coffeeLogo}" alt="Coffee24h Cup" />
         </button>
         <h1 class="brand-title">
           <span id="txtTitle">Coffee24h</span>
-          <span id="editionTag" class="gdu-tag" title="Click để chuyển đổi ly giữa GDU Blue Cup và Eco Recycle Leaf Cup">GDU</span>
+          <span id="editionTag" class="gdu-tag" title="Click để chuyển đổi phiên bản Giảng Viên ⇄ Sinh Viên">GDU</span>
         </h1>
         <span id="txtSubtitle" style="display: none;"></span>
       </div>
@@ -545,8 +545,8 @@ function applyCupEdition(edition, announce = false) {
   if (btnCupToggle) {
     btnCupToggle.className = `brand-cup-btn ${isEco ? 'eco' : ''} spin`;
     btnCupToggle.title = isEco
-      ? (currentLang === 'vi' ? '🌱 Ly Tái Chế Eco (Sinh Viên) - Click để đổi về Ly GDU Gốc' : '🌱 Eco Student Leaf Cup - Click to switch to Classic GDU Cup')
-      : (currentLang === 'vi' ? '☕ Ly GDU Gốc - Click để đổi sang Ly Tái Chế Eco (Sinh Viên)' : '☕ Classic GDU Cup - Click to switch to Eco Student Cup');
+      ? (currentLang === 'vi' ? '🌱 Phiên bản GDU Sinh Viên (Ly Tái Chế) - Click để đổi sang Giảng Viên (Tách Xanh Logo GDU)' : '🌱 GDU Student Edition (Recycle Leaf Cup) - Click to switch to Lecturer (Blue Cup GDU Logo)')
+      : (currentLang === 'vi' ? '☕ Phiên bản GDU Giảng Viên (Tách Xanh Logo GDU) - Click để đổi sang Sinh Viên (Ly Tái Chế)' : '☕ GDU Lecturer Edition (Blue Cup GDU Logo) - Click to switch to Student (Recycle Leaf Cup)');
     setTimeout(() => {
       if (btnCupToggle) btnCupToggle.classList.remove('spin');
     }, 550);
@@ -554,10 +554,10 @@ function applyCupEdition(edition, announce = false) {
 
   if (editionTag) {
     editionTag.className = isEco ? 'eco-tag' : 'gdu-tag';
-    editionTag.textContent = isEco ? 'ECO 🌱' : 'GDU';
+    editionTag.textContent = 'GDU';
     editionTag.title = isEco
-      ? (currentLang === 'vi' ? 'Phiên bản Eco Sinh Viên - Click để đổi ly' : 'Eco Student Edition - Click to switch')
-      : (currentLang === 'vi' ? 'Phiên bản GDU Gốc - Click để đổi ly' : 'GDU Classic Edition - Click to switch');
+      ? (currentLang === 'vi' ? 'Phiên bản GDU Sinh Viên (Ly Tái Chế) - Click để đổi ly' : 'GDU Student Edition (Recycle Cup) - Click to switch')
+      : (currentLang === 'vi' ? 'Phiên bản GDU Giảng Viên (Tách Xanh Logo GDU) - Click để đổi ly' : 'GDU Lecturer Edition (Blue Cup GDU Logo) - Click to switch');
   }
 
   if (isEco) {
@@ -574,8 +574,8 @@ function applyCupEdition(edition, announce = false) {
     playBatyTuongSound();
     if (toastNotice) {
       toastNotice.textContent = isEco
-        ? (currentLang === 'vi' ? '🌱 Đã bật Ly Tái Chế Eco (Phiên bản Sinh Viên GDU)!' : '🌱 Switched to Eco Recycle Leaf Cup (Student Edition)!')
-        : (currentLang === 'vi' ? '☕ Đã bật Ly Cà Phê GDU Gốc!' : '☕ Switched to Classic GDU Coffee Cup!');
+        ? (currentLang === 'vi' ? '🌱 Đã bật Ly Tái Chế (Phiên bản GDU Sinh Viên)!' : '🌱 Switched to GDU Student Edition (Recycle Leaf Cup)!')
+        : (currentLang === 'vi' ? '☕ Đã bật Tách Cà Phê Xanh Logo GDU (Phiên bản Giảng Viên)!' : '☕ Switched to GDU Lecturer Edition (Blue Cup GDU Logo)!');
       toastNotice.style.color = isEco ? 'var(--accent-emerald)' : 'var(--gdu-gold)';
       setTimeout(() => {
         if (toastNotice) {
