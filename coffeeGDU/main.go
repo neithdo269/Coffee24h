@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"strings"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -48,6 +49,16 @@ func main() {
 			UniqueId: "coffee24h-gdu-keepawake-2026",
 			OnSecondInstanceLaunch: func(data options.SecondInstanceData) {
 				if app != nil && app.ctx != nil {
+					for _, arg := range data.Args {
+						lower := strings.ToLower(arg)
+						if lower == "--student" || lower == "-e" || lower == "--eco" || lower == "--leaf" || lower == "--recycle" {
+							app.SetCupEdition("student")
+							break
+						} else if lower == "--lecturer" || lower == "--teacher" || lower == "--gdu" {
+							app.SetCupEdition("lecturer")
+							break
+						}
+					}
 					app.domReady(app.ctx)
 					runtime.WindowShow(app.ctx)
 					runtime.WindowUnminimise(app.ctx)

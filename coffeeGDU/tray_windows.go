@@ -40,6 +40,7 @@ const (
 	CMD_TOGGLE = 1002
 	CMD_LOCK   = 1003
 	CMD_QUIT   = 1004
+	CMD_SWITCH = 1005
 )
 
 var (
@@ -66,10 +67,13 @@ var (
 	procLoadImage           = user32DLL.NewProc("LoadImageW")
 	procFindWindow          = user32DLL.NewProc("FindWindowW")
 	procSendMessage         = user32DLL.NewProc("SendMessageW")
+	procRegisterWindowMessage = user32DLL.NewProc("RegisterWindowMessageW")
 
 	kernel32DLL           = syscall.NewLazyDLL("kernel32.dll")
 	procGetModuleHandle   = kernel32DLL.NewProc("GetModuleHandleW")
 	procGetModuleFileName = kernel32DLL.NewProc("GetModuleFileNameW")
+
+	wmTaskbarCreated uintptr
 )
 
 type NOTIFYICONDATAW struct {
@@ -125,7 +129,7 @@ var (
 	trayApp           *App
 	trayHwnd          uintptr
 	trayHIcon         uintptr
-	currentCupEdition = "gdu"
+	currentCupEdition = "lecturer"
 	trayMu            sync.Mutex
 	trayCreated       bool
 )
@@ -161,7 +165,7 @@ func loadCupHIcon(hInstance uintptr, edition string) uintptr {
 	const LR_LOADFROMFILE = 0x00000010
 
 	var candidates []string
-	if edition == "eco" || edition == "student" {
+	if edition == "student" || edition == "eco" {
 		candidates = []string{
 			"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
 			"Coffee-icon-leafCup.ico",
@@ -173,7 +177,6 @@ func loadCupHIcon(hInstance uintptr, edition string) uintptr {
 			"CoffeeGDU icons\\Coffee-24h-GDU-BlueCup-Lecturer.ico",
 			"Coffee-24h-GDU-BlueCup-Lecturer.ico",
 			"build\\windows\\icon.ico",
-			"CoffeeGDU icons\\Coffee-24h-GDU-64Gperpackage-icon.ico",
 			"CoffeeGDU icons\\Coffee-icon-leafCup.ico",
 		}
 	}
@@ -203,9 +206,9 @@ func loadCupHIcon(hInstance uintptr, edition string) uintptr {
 }
 
 func loadTrayIcon(hInstance uintptr) uintptr {
-	edition := "gdu"
+	edition := "lecturer"
 	if trayApp != nil && trayApp.cliOpts.EcoCup {
-		edition = "eco"
+		edition = "student"
 	}
 	currentCupEdition = edition
 	return loadCupHIcon(hInstance, edition)
@@ -216,8 +219,10 @@ func switchCupIcon(edition string) {
 	defer trayMu.Unlock()
 
 	edition = strings.ToLower(edition)
-	if edition != "eco" && edition != "gdu" {
-		edition = "gdu"
+	if edition == "student" || edition == "eco" {
+		edition = "student"
+	} else {
+		edition = "lecturer"
 	}
 	currentCupEdition = edition
 
@@ -284,6 +289,9 @@ func runTrayMessageLoop() {
 	procShellNotifyIcon.Call(uintptr(NIM_ADD), uintptr(unsafe.Pointer(&nid)))
 	trayCreated = true
 
+	msgStr, _ := syscall.UTF16PtrFromString("TaskbarCreated")
+	wmTaskbarCreated, _, _ = procRegisterWindowMessage.Call(uintptr(unsafe.Pointer(msgStr)))
+
 	// Message loop
 	var msg MSG
 	for {
@@ -297,6 +305,22 @@ func runTrayMessageLoop() {
 }
 
 func trayWndProc(hwnd uintptr, msg uint32, wParam, lParam uintptr) uintptr {
+	if uint32(wmTaskbarCreated) != 0 && msg == uint32(wmTaskbarCreated) {
+		// Explorer restarted: Re-register tray icon in "Show hidden icons"
+		var nid NOTIFYICONDATAW
+		nid.CbSize = uint32(unsafe.Sizeof(nid))
+		nid.HWnd = hwnd
+		nid.UID = 1
+		nid.UFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP
+		nid.UCallbackMessage = WM_TRAYICON
+		nid.HIcon = trayHIcon
+		tip, _ := syscall.UTF16FromString("Coffee24h - Keep Awake")
+		copy(nid.SzTip[:], tip)
+		procShellNotifyIcon.Call(uintptr(NIM_ADD), uintptr(unsafe.Pointer(&nid)))
+		trayCreated = true
+		return 0
+	}
+
 	switch msg {
 	case WM_TRAYICON:
 		switch lParam {
@@ -336,11 +360,21 @@ func showTrayMenu(hwnd uintptr) {
 	}
 	defer procDestroyMenu.Call(hMenu)
 
-	titleStr, _ := syscall.UTF16PtrFromString("☕ Coffee24h - Mở giao diện")
+	editionLabel := "Giảng Viên"
+	switchTarget := "Sinh Viên"
+	if currentCupEdition == "student" || currentCupEdition == "eco" {
+		editionLabel = "Sinh Viên"
+		switchTarget = "Giảng Viên"
+	}
+
+	titleStr, _ := syscall.UTF16PtrFromString("☕ Coffee24h (" + editionLabel + ") - Mở giao diện")
 	procAppendMenu.Call(hMenu, MF_STRING, CMD_SHOW, uintptr(unsafe.Pointer(titleStr)))
 
 	toggleStr, _ := syscall.UTF16PtrFromString("⚡ Bật / Tắt Awake (Toggle)")
 	procAppendMenu.Call(hMenu, MF_STRING, CMD_TOGGLE, uintptr(unsafe.Pointer(toggleStr)))
+
+	switchStr, _ := syscall.UTF16PtrFromString("🔄 Đổi sang bản " + switchTarget)
+	procAppendMenu.Call(hMenu, MF_STRING, CMD_SWITCH, uintptr(unsafe.Pointer(switchStr)))
 
 	lockStr, _ := syscall.UTF16PtrFromString("🔒 Khóa máy ngay (Win + L)")
 	procAppendMenu.Call(hMenu, MF_STRING, CMD_LOCK, uintptr(unsafe.Pointer(lockStr)))
@@ -366,6 +400,12 @@ func showTrayMenu(hwnd uintptr) {
 		runtime.WindowUnminimise(trayApp.ctx)
 	case CMD_TOGGLE:
 		trayApp.ToggleAwake()
+	case CMD_SWITCH:
+		if currentCupEdition == "student" || currentCupEdition == "eco" {
+			trayApp.SetCupEdition("lecturer")
+		} else {
+			trayApp.SetCupEdition("student")
+		}
 	case CMD_LOCK:
 		_ = trayApp.LockNow()
 	case CMD_QUIT:
