@@ -58,8 +58,48 @@ npm install
 npm run build
 cd ..
 
-# 2. Build Go binary with Wails tags
+# 2. Embed Windows icon & resources
+go-winres make --arch amd64
+
+# 3. Build Go binary with Wails tags
 go build -tags desktop,production -ldflags "-H windowsgui -w -s" -o coffee24h.exe .
+```
+
+---
+
+## 💻 Command-Line Interface (CLI)
+
+Coffee24h supports seamless terminal execution and automation flags from any directory.
+
+### Quick Setup
+Run the setup script once to add `coffee24h` to your global `PATH` and deploy the launcher shim:
+```powershell
+.\setup-cli.cmd
+# Or via PowerShell:
+powershell -ExecutionPolicy Bypass -File .\setup-cli.ps1
+```
+
+### CLI Flags & Usage
+```text
+Usage:
+  coffee24h [flags]
+
+Flags:
+  -h, --help            Show CLI help reference
+  -v, --version         Show application version
+  -m, --tray            Start directly into System Tray ("Show hidden icons")
+  -a, --awake           Immediately activate Keep-Awake mode upon launch
+  -t, --time <dur>      Start a timed session (e.g. 15m, 30m, 1h, 2h, 4h, 90m)
+  -s, --system-only     Keep CPU/downloads awake with display sleep enabled
+  -l, --autolock        Auto-lock workstation (Win + L) when session expires
+  --no-safeguard        Disable battery safeguard (<5% auto-stop)
+
+Examples:
+  coffee24h                    # Launch GUI normally
+  coffee24h --tray             # Start silently in "Show hidden icons"
+  coffee24h --awake            # Launch and immediately keep laptop awake
+  coffee24h --time 2h          # Keep awake for 2 hours with timer
+  coffee24h -s --time 1h       # 1 hour system-only awake (screen turns off, CPU runs)
 ```
 
 ---

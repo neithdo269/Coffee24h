@@ -14,16 +14,28 @@ import (
 var assets embed.FS
 
 func main() {
+	cliOpts := parseCLI()
+	if cliOpts.ShowHelp {
+		printHelp()
+		return
+	}
+	if cliOpts.ShowVersion {
+		printVersion()
+		return
+	}
+
 	app := NewApp()
+	app.cliOpts = cliOpts
 
 	err := wails.Run(&options.App{
-		Title:            "Coffee24h ☕ GDU",
-		Width:            350,
-		Height:           350,
-		MinWidth:         320,
-		MinHeight:        320,
-		DisableResize:    false,
-		Frameless:        true,
+		Title:             "Coffee24h ☕ GDU",
+		Width:             350,
+		Height:            350,
+		MinWidth:          320,
+		MinHeight:         320,
+		DisableResize:     false,
+		Frameless:         true,
+		StartHidden:       cliOpts.StartTray,
 		HideWindowOnClose: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,

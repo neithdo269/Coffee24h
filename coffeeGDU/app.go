@@ -41,6 +41,7 @@ type App struct {
 	state      AwakeState
 	timerDone  chan struct{}
 	tickerStop chan struct{}
+	cliOpts    CLIOptions
 }
 
 // NewApp creates a new App application struct
@@ -68,6 +69,23 @@ func (a *App) startup(ctx context.Context) {
 
 	// Start background poller for battery & status tick
 	go a.statusLoop()
+
+	// Process CLI startup flags
+	if a.cliOpts.AwakeNow || a.cliOpts.TimedMin > 0 || a.cliOpts.SystemOnly {
+		mode := "until_off"
+		keepDisplay := true
+		if a.cliOpts.SystemOnly {
+			mode = "system_only"
+			keepDisplay = false
+		} else if a.cliOpts.TimedMin > 0 {
+			mode = "timed"
+		}
+		safeguard := !a.cliOpts.NoSafeguard
+		go func() {
+			time.Sleep(300 * time.Millisecond)
+			_, _ = a.StartAwake(mode, keepDisplay, a.cliOpts.TimedMin, safeguard, 5, a.cliOpts.AutoLock)
+		}()
+	}
 }
 
 // domReady anchors the window at the bottom-right corner of the primary screen above the taskbar.
