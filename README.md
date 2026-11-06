@@ -1,0 +1,245 @@
+# ☕ Coffee24h — GDU Keep-Awake System Utility
+
+<p align="center">
+  <img src="coffeeGDU/frontend/src/assets/images/coffee-logo.png" width="100" alt="Coffee24h GDU Blue Cup" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="coffeeGDU/frontend/src/assets/images/coffee-leafcup.png" width="90" alt="Coffee24h GDU Eco Cup" />
+</p>
+
+<p align="center">
+  <strong>Cross-Platform Keep-Awake Daemon & Intelligent Power Orchestration Utility</strong><br />
+  <em>Specially crafted for Gia Dinh University (GDU) Faculty & Students</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/nynwadhyhcz8/Coffee24h"><img src="https://img.shields.io/badge/Release-v1.0.0-blue.svg?style=flat-square" alt="Version" /></a>
+  <a href="https://golang.org"><img src="https://img.shields.io/badge/Go-1.22+-00ADD8.svg?style=flat-square&logo=go" alt="Go Version" /></a>
+  <a href="https://wails.io"><img src="https://img.shields.io/badge/Framework-Wails%20v2-DF1A29.svg?style=flat-square" alt="Wails v2" /></a>
+  <a href="#-low-level-os-architecture"><img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-brightgreen.svg?style=flat-square" alt="Platforms" /></a>
+  <a href="#-about-gia-dinh-university-gdu--brand-identity"><img src="https://img.shields.io/badge/Edition-GDU%20University-f59e0b.svg?style=flat-square" alt="GDU Edition" /></a>
+  <a href="https://github.com/nynwadhyhcz8/Coffee24h/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License" /></a>
+</p>
+
+---
+
+## 📑 Table of Contents
+1. [🎓 About Gia Dinh University (GDU) & Brand Identity](#-about-gia-dinh-university-gdu--brand-identity)
+2. [🌌 The Vision & Mission: Contributing to a University Operating System](#-the-vision--mission-contributing-to-a-university-operating-system)
+3. [⚡ Core Capabilities & Keep-Awake Modes](#-core-capabilities--keep-awake-modes)
+4. [🏗️ Low-Level OS Architecture](#️-low-level-os-architecture)
+5. [🖥️ Cross-Platform Hardware & Power Mapping](#️-cross-platform-hardware--power-mapping)
+6. [🛠️ Build & Installation Guide](#️-build--installation-guide)
+7. [⚙️ 1-Click Multi-Setup Manager](#️-1-click-multi-setup-manager)
+8. [💻 Command-Line Interface (CLI)](#-command-line-interface-cli)
+9. [👨‍💻 Author & Acknowledgments](#-author--acknowledgments)
+
+---
+
+## 🎓 About Gia Dinh University (GDU) & Brand Identity
+
+**Trường Đại học Gia Định (Gia Dinh University - GDU)** is a dynamic, modern, and forward-looking university based in Ho Chi Minh City, Vietnam. Guided by the educational philosophy of *"Ứng dụng - Trải nghiệm - Việc làm"* (Application - Practical Experience - Career Readiness) and the motto **"Chọn Gia Định - Chọn Thành Công"** (Choose Gia Dinh - Choose Success), GDU empowers students to master practical, industry-grade software engineering, computer science, and creative technology.
+
+<p align="center">
+  <img src="coffeeGDU/frontend/src/assets/images/logo-universal.png" width="300" alt="GDU Universal Logo" />
+</p>
+
+### 🎨 Authentic GDU Visual Design
+Coffee24h was engineered from the ground up to reflect the proud visual identity of Gia Dinh University:
+- **GDU Navy & Deep Ocean (`#061120`, `#0b2545`):** Expressing academic depth, technological trust, and focus.
+- **GDU Gold (`#f59e0b`):** Radiating energy, creativity, and student success.
+- **Flame Red (`#dc2626`):** Symbolizing vibrant enthusiasm and determination.
+
+### 🔄 Dual-Edition Dynamic Toggle (Clean Code Architecture)
+Users can seamlessly toggle between two distinct university editions with a single click on the cup or title tag, or by passing CLI flags:
+- **👔 GDU Giảng Viên (Lecturer Edition):** Features the distinguished Royal Blue ceramic cup stamped with the official GDU emblem.
+- **🌱 GDU Sinh Viên (Student Edition):** Features the Eco-friendly Recyclable Leaf Cup, representing youthful vitality, green campus initiatives, and sustainable lifestyle.
+
+---
+
+## 🌌 The Vision & Mission: Contributing to a University Operating System
+
+### 💡 The Backstory & Passion
+> *"Coffee24h was designed and coded by **Neith Do** on a dedicated technological mission: to research, engineer, and contribute foundational low-level system modules toward the long-term vision of a specialized **University Operating System (GDU OS)** tailored for Gia Dinh University."*
+
+Creating a custom or specialized operating system distribution for academic institutions is a profound endeavor. In university research centers, computer labs, and lecture halls, students and professors regularly execute long-running computational workloads:
+- **Machine Learning & Deep Neural Network Training:** Hours or days of uninterrupted GPU/CPU compute cycles.
+- **Large-Scale Software Compilation & Rendering:** 3D CAD modeling, game engine builds, and data analytics pipelines.
+- **Automated Laboratory Scripts & Server Daemons:** Continuous background data processing.
+
+If a conventional operating system unexpectedly triggers power-saving sleep, screensavers, or display standby during these tasks, training checkpoints are corrupted, socket connections drop, and hours of research work are lost.
+
+### 🚀 Coffee24h as a Core OS Building Block
+Within the broader roadmap of a university-centric OS, Coffee24h serves as the **Native Power Orchestrator & Compute Persistence Subsystem**:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                   Future University OS (GDU OS Vision)                  │
+├────────────────────────────────────────────────────────────────────────┤
+│  User Space Applications & Research Tools (IDEs, AI Labs, Compilers)   │
+├────────────────────────────────────────────────────────────────────────┤
+│  🎯 Coffee24h System Daemon & Subsystem Core:                          │
+│     ├─ Low-level Execution State Lock (Kernel Sleep Interception)      │
+│     ├─ Real-time Hardware Battery Telemetry & Safeguard (<5%)          │
+│     ├─ Background Workstation Security Lock (Win+L / PAM Lock)         │
+│     ├─ System Tray Shell Integration & Crash Auto-Recovery             │
+│     └─ Microsecond-accurate Harmonic Melodic Audio Alerts              │
+├────────────────────────────────────────────────────────────────────────┤
+│  OS Kernel / Driver Interfaces (Win32, Darwin IOKit, Linux systemd)    │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+By proving that a lightweight, native Go engine can interface directly with OS execution registers while hosting an ultra-responsive, GPU-accelerated DirectComposition UI, Coffee24h establishes a battle-tested foundation for future system software developed at GDU.
+
+---
+
+## ⚡ Core Capabilities & Keep-Awake Modes
+
+| Mode / Feature | Behavior & Purpose | Typical Use Case |
+| :--- | :--- | :--- |
+| **♾️ Vô Hạn (Until Off)** | Blocks all OS standby, sleep timers, display dimming, and screensavers until manual stop. | Heavy interactive coding, hackathons, lab presentations. |
+| **💻 Chạy Nền (System-Only)** | Allows the monitor to turn off to save power and protect OLED/IPS panels, while CPU, network downloads, and compute threads stay at 100%. | Overnight model training, large dataset downloads, video rendering. |
+| **⏱️ Hẹn Giờ (Timed Session)** | Quick presets (**15m**, **30m**, **1h**, **2h**, **4h**) with an active countdown timer and 3-tone bell melody (`E5 -> G5 -> C6`). | Pomodoro focus sessions, timed classroom exams, scheduled lab runs. |
+| **🛡️ Bảo Vệ Pin (Safeguard)** | Automatically releases wake lock when battery drops below 5% to prevent sudden power outage. | Traveling students, un-plugged library study sessions. |
+| **🔒 Khóa Máy (Win + L)** | Instant 1-click workstation lock via native API call (`LockWorkStation`). | Stepping away from the desk in public university libraries. |
+| **💎 Bo Tròn 4 Góc (Subpixel)** | Pure DirectComposition 32-bit ARGB with 14px anti-aliased rounded corners and no jagged 1-bit GDI stair-stepping. | Modern, aesthetic glassmorphism UI matching Windows 11/10. |
+
+---
+
+## 🏗️ Low-Level OS Architecture
+
+Coffee24h utilizes a **Hybrid Systems Architecture** that pairs the raw speed and direct Win32/POSIX syscall access of **Go** with the visual elegance of **Vite + CSS3 Glassmorphism**:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│                    Frontend UI Layer                       │
+│    Vite + Vanilla JS + CSS3 Glassmorphism (350x350 1:1)    │
+│       - Dual Edition Switcher (Lecturer ⇄ Student)         │
+│       - Web Audio Harmonic Synthesizer (Offline Chimes)    │
+│       - Bilingual Reactive i18n (Tiếng Việt & English)     │
+└────────────────────────────▲───────────────────────────────┘
+                             │ Wails v2 Bidirectional IPC Bridge
+┌────────────────────────────▼───────────────────────────────┐
+│                   Go Core Subsystem Layer                  │
+│    - The Shield: Thread-safe atomic Mutex (sync.Mutex)     │
+│    - Pinned OS Thread Execution (runtime.LockOSThread)     │
+│    - Deterministic State Machine (AwakeState Engine)       │
+├────────────────────────────────────────────────────────────┤
+│                Native OS Kernel Interfacing                │
+│    Windows (Win32):                                        │
+│      • SetThreadExecutionState (ES_CONTINUOUS | ...)       │
+│      • Shell_NotifyIconW (System Tray with TaskbarCreated) │
+│      • LockWorkStation (Instant physical security)         │
+│      • GetSystemPowerStatus (Battery telemetry)            │
+│    macOS (Darwin):                                         │
+│      • caffeinate -d -i -m -u & pmset battery parsing      │
+│    Linux (X11 / Wayland):                                  │
+│      • systemd-inhibit / org.freedesktop.ScreenSaver       │
+└────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🖥️ Cross-Platform Hardware & Power Mapping
+
+| Operating System | Sleep Interception Mechanism | Display State Handling | Battery Telemetry Source |
+| :--- | :--- | :--- | :--- |
+| **🪟 Windows (10 / 11)** | `SetThreadExecutionState` with pinned OS thread | `ES_DISPLAY_REQUIRED` flag toggling | Win32 `GetSystemPowerStatus` API |
+| **🍎 macOS (Intel & Apple Silicon)** | `caffeinate -i -d` subprocess orchestration | Dynamic flag switching (`-d` / `-i`) | `pmset -g batt` POSIX pipe |
+| **🐧 Linux (Debian, Ubuntu, Fedora)** | `systemd-inhibit` / D-Bus Screensaver API | D-Bus lock acquisition | Linux kernel `/sys/class/power_supply/` |
+
+---
+
+## 🛠️ Build & Installation Guide
+
+### Prerequisites
+- **Go** (1.20+): `winget install GoLang.Go`
+- **Node.js** (npm LTS): `winget install OpenJS.NodeJS.LTS`
+- **Wails CLI**: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+- **WebView2 Runtime**: Included by default in modern Windows 10/11
+
+### 🚀 Production Compilation (Windows)
+From the `coffeeGDU` folder:
+
+```powershell
+# Step 1: Compile the frontend assets
+cd coffeeGDU/frontend
+npm install
+npm run build
+cd ..
+
+# Step 2: Compile native Go executable with production tags
+go build -tags desktop,production -ldflags "-H windowsgui -w -s" -o coffee24h.exe .
+```
+
+*Or via the official Wails CLI:*
+```powershell
+cd coffeeGDU
+wails build
+```
+
+---
+
+## ⚙️ 1-Click Multi-Setup Manager
+
+To deploy Coffee24h effortlessly on any Windows workstation, double-click **`setup.cmd`** (or execute `setup.ps1` in PowerShell):
+
+```text
+==============================================================
+   Coffee24h - Multi-Setup Manager (Various Setup Options)
+   Keep-Awake Utility for Gia Dinh University (GDU)
+==============================================================
+  [1] Full Setup (All Recommended Setups in 1-Click)
+  [2] Terminal CLI Setup (Add to PATH & WinGet Links)
+  [3] Auto-Start on Windows Login (Silent to System Tray)
+  [4] Create Desktop Shortcut (Custom GDU Icon)
+  [5] Create Start Menu Shortcut (Windows Searchable)
+  [6] Win + R Run Dialog ('coffee24h')
+  [7] PowerShell Profile Aliases ('coffee', 'c24')
+  [8] Remove / Uninstall All Integrations
+==============================================================
+```
+
+---
+
+## 💻 Command-Line Interface (CLI)
+
+Coffee24h includes a full-featured terminal CLI, allowing lab administrators, students, and automation scripts to control wake states without opening the GUI:
+
+```text
+Usage:
+  coffee24h [flags]
+
+Flags:
+  -h, --help            Show CLI help reference
+  -v, --version         Show application version
+  -m, --tray            Start directly into System Tray ("Show hidden icons")
+  -a, --awake           Immediately activate Keep-Awake mode upon launch
+  -t, --time <dur>      Start a timed session (e.g. 15m, 30m, 1h, 2h, 4h, 90m)
+  -s, --system-only     Keep CPU/downloads awake with display sleep enabled
+  -l, --autolock        Auto-lock workstation (Win + L) when session expires
+  --student             Launch in GDU Student Edition (Eco-friendly Leaf Cup)
+  --lecturer            Launch in GDU Lecturer Edition (Blue GDU Logo Cup)
+  --no-safeguard        Disable battery safeguard (<5% auto-stop)
+```
+
+### CLI Quick Examples:
+```powershell
+coffee24h --awake                  # Launch and immediately keep laptop awake
+coffee24h --tray                   # Start silently into system tray
+coffee24h --time 2h --autolock     # Keep awake for 2 hours, then lock machine
+coffee24h -s --time 1h             # 1 hour background compute (screen can sleep)
+coffee24h --student                # Launch directly in GDU Student Edition
+```
+
+---
+
+## 👨‍💻 Author & Acknowledgments
+
+- **Creator & Lead Engineer:** **Neith Do** ([@nynwadhyhcz8](https://github.com/nynwadhyhcz8) / `16av112thien@gmail.com`)
+- **Institution:** Dedicated with passion to **Gia Dinh University (GDU)** — Faculty, Researchers, and Students.
+- **Architectural Reference:** Detailed troubleshooting and code patterns are documented in [`DEVELOPER_GUIDE.md`](./DEVELOPER_GUIDE.md).
+
+<p align="center">
+  <strong>Made with ❤️, ☕, and ambition for Gia Dinh University (GDU)</strong><br />
+  <em>"Chọn Gia Định — Chọn Thành Công"</em>
+</p>
