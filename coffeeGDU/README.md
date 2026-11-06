@@ -15,8 +15,25 @@
   <a href="https://github.com/nynwadhyhcz8/Coffee24h"><img src="https://img.shields.io/badge/Release-v1.0.0-blue.svg?style=flat-square" alt="Version" /></a>
   <a href="https://golang.org"><img src="https://img.shields.io/badge/Go-1.22+-00ADD8.svg?style=flat-square&logo=go" alt="Go Version" /></a>
   <a href="https://wails.io"><img src="https://img.shields.io/badge/Framework-Wails%20v2-DF1A29.svg?style=flat-square" alt="Wails v2" /></a>
+  <a href="#-installation-guide-windows-macos-linux"><img src="https://img.shields.io/badge/Install-Windows%20%7C%20macOS%20%7C%20Linux-brightgreen.svg?style=flat-square" alt="Multi-OS Install" /></a>
   <a href="https://github.com/nynwadhyhcz8/Coffee24h/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License" /></a>
 </p>
+
+---
+
+## 📑 Table of Contents
+1. [🎓 About Gia Dinh University (GDU)](#-about-gia-dinh-university-gdu)
+2. [🌌 The Mission: Paving the Way for a University Operating System](#-the-mission-paving-the-way-for-a-university-operating-system-gdu-os)
+3. [⚡ Core Capabilities & Keep-Awake Modes](#-core-capabilities--keep-awake-modes)
+4. [📥 Installation Guide (Windows, macOS, Linux)](#-installation-guide-windows-macos-linux)
+   - [🪟 Windows Setup](#-1-windows-installation-windows-10--11)
+   - [🍎 macOS Setup](#-2-macos-installation-apple-silicon--intel)
+   - [🐧 Linux Setup](#-3-linux-installation-ubuntu-debian-fedora-arch)
+5. [🖥️ Cross-Platform Architecture](#️-cross-platform-architecture)
+6. [🛠️ Building from Source & Packaging](#️-building-from-source--packaging)
+7. [⚙️ Various Ways to Set Up Coffee24h](#️-various-ways-to-set-up-coffee24h)
+8. [💻 Command-Line Interface (CLI)](#-command-line-interface-cli)
+9. [👨‍💻 Author & Mission Dedication](#-author--mission-dedication)
 
 ---
 
@@ -52,7 +69,7 @@ Coffee24h serves as a **production-grade proof-of-concept and subsystem module**
 
 ---
 
-## 🚀 Key Features
+## ⚡ Core Capabilities & Keep-Awake Modes
 
 1. **Until Off Mode (Vô Hạn)**:
    - Blocks OS sleep, screen dimming, and screensaver.
@@ -72,6 +89,76 @@ Coffee24h serves as a **production-grade proof-of-concept and subsystem module**
 
 ---
 
+## 📥 Installation Guide (Windows, macOS, Linux)
+
+### 🪟 1. Windows Installation (Windows 10 / 11)
+
+#### Method A: NSIS Setup Wizard Installer
+1. Download **`coffee24h-installer.exe`** from [Releases](https://github.com/nynwadhyhcz8/Coffee24h/releases).
+2. Run the wizard: automatically installs Coffee24h, registers Desktop & Start Menu shortcuts, and provides clean uninstallation.
+
+#### Method B: Standalone Portable Executable
+1. Download **`coffee24h.exe`** from [Releases](https://github.com/nynwadhyhcz8/Coffee24h/releases).
+2. Save it anywhere (e.g. `C:\Tools\Coffee24h\` or Desktop) and double-click to run. No admin rights or installation required.
+
+#### Method C: 1-Click Multi-Setup Manager (From Repository)
+Double-click **`setup.cmd`** in the repository root or run PowerShell:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup.ps1 -All
+```
+
+---
+
+### 🍎 2. macOS Installation (Apple Silicon & Intel)
+
+Coffee24h is compiled as a Universal Binary supporting both **Apple Silicon (M1/M2/M3/M4)** and **Intel x86_64**.
+
+#### Method A: Universal DMG Installer
+1. Download **`Coffee24h-macOS-Universal.dmg`** from [Releases](https://github.com/nynwadhyhcz8/Coffee24h/releases).
+2. Open the `.dmg` and drag **`Coffee24h.app`** into **`/Applications`**.
+3. Launch from Launchpad or Spotlight.
+
+> [!TIP]
+> **macOS Gatekeeper Note:**  
+> If prompted with *"Coffee24h cannot be opened because it is from an unidentified developer"*, right-click `Coffee24h.app` in Finder and choose **Open**, or run:
+> ```bash
+> xattr -cr /Applications/Coffee24h.app
+> ```
+
+#### Method B: Terminal Command-Line Alias
+```bash
+echo 'alias coffee24h="/Applications/Coffee24h.app/Contents/MacOS/Coffee24h"' >> ~/.zshrc
+source ~/.zshrc
+coffee24h --awake --time 2h
+```
+
+---
+
+### 🐧 3. Linux Installation (Ubuntu, Debian, Fedora, Arch)
+
+#### Method A: Debian / Ubuntu Package (`.deb`)
+```bash
+sudo apt install ./coffee24h_1.0.0_amd64.deb
+# Or:
+sudo dpkg -i coffee24h_1.0.0_amd64.deb
+```
+Installs binary to `/usr/bin/coffee24h`, configures system desktop entry, and registers high-res icons.
+
+#### Method B: Universal Standalone AppImage
+```bash
+chmod +x Coffee24h-x86_64.AppImage
+./Coffee24h-x86_64.AppImage
+```
+
+#### Method C: Manual Binary Installation
+```bash
+sudo install -m 755 coffee24h /usr/local/bin/coffee24h
+sudo cp build/linux/coffee24h.desktop /usr/share/applications/
+sudo cp build/linux/coffee24h.png /usr/share/icons/hicolor/256x256/apps/
+```
+
+---
+
 ## 🖥️ Cross-Platform Architecture
 
 | OS | Keep-Awake Mechanism | Battery Detection | Workstation Lock |
@@ -82,40 +169,41 @@ Coffee24h serves as a **production-grade proof-of-concept and subsystem module**
 
 ---
 
-## 🛠️ Building & Running
-
-> [!IMPORTANT]
-> This application is built with **Wails v2**. If you compile with plain `go build` without tags, Wails will request build tags. Always build using either the **Wails CLI** or `go build -tags desktop,production`.
+## 🛠️ Building from Source & Packaging
 
 ### Prerequisites
-- **Go** (1.20+): `winget install GoLang.Go`
-- **Node.js** (npm LTS): `winget install OpenJS.NodeJS.LTS`
+- **Go** (1.20+): `winget install GoLang.Go` (or `brew install go`, `sudo apt install golang`)
+- **Node.js** (npm LTS): `winget install OpenJS.NodeJS.LTS` (or `brew install node`, `sudo apt install nodejs npm`)
 - **Wails CLI**: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
-- **WebView2 Runtime**: Preinstalled on Windows 10/11
+- **Linux Dev Headers:** `sudo apt install libgtk-3-dev libwebkit2gtk-4.0-dev` (or `webkit2gtk-4.1-dev`)
 
----
-
-### Option 1: Standard Wails Build (Recommended)
-From this directory (`coffeeGDU`):
+### 🪟 Windows Build
 ```powershell
-# Compiles frontend with Vite and packages the executable into build/bin/
+# Standalone binary:
 wails build
+
+# NSIS Windows Setup Installer:
+wails build -nsis
 ```
 
-### Option 2: Manual Go Build
-```powershell
-# 1. Build frontend
-cd frontend
-npm install
-npm run build
-cd ..
-
-# 2. Embed Windows icon & resources (if go-winres installed)
-go-winres make --arch amd64
-
-# 3. Build Go binary with Wails production tags
-go build -tags desktop,production -ldflags "-H windowsgui -w -s" -o coffee24h.exe .
+### 🍎 macOS Universal Build (.dmg)
+```bash
+chmod +x ./build/darwin/build-dmg.sh
+./build/darwin/build-dmg.sh
 ```
+Output: `build/bin/Coffee24h.app` & `build/bin/Coffee24h-macOS-Universal.dmg`
+
+### 🐧 Linux Build (.deb & .AppImage)
+```bash
+# Debian / Ubuntu .deb package:
+chmod +x ./build/linux/build-deb.sh
+./build/linux/build-deb.sh 1.0.0
+
+# Universal AppImage:
+chmod +x ./build/linux/build-appimage.sh
+./build/linux/build-appimage.sh
+```
+Output: `build/bin/coffee24h_1.0.0_amd64.deb` & `build/bin/Coffee24h-x86_64.AppImage`
 
 ---
 
@@ -167,32 +255,6 @@ Examples:
   coffee24h -s --time 1h       # 1 hour system-only awake (screen turns off, CPU runs)
   coffee24h --student          # Launch directly with GDU Student Edition
 ```
-
----
-
-## 📦 Cross-Platform Packaging
-
-### 🍎 macOS (.app / .dmg)
-```bash
-wails build -platform darwin/universal
-./build/darwin/build-dmg.sh
-```
-Output: `build/bin/Coffee24h.app` & `build/bin/Coffee24h-macOS-Universal.dmg`
-
-### 🐧 Linux (.deb / AppImage)
-```bash
-wails build -platform linux/amd64
-./build/linux/build-deb.sh 1.0.0
-./build/linux/build-appimage.sh
-```
-Output: `build/bin/coffee24h_1.0.0_amd64.deb` & `build/bin/Coffee24h-x86_64.AppImage`
-
-### 🪟 Windows (.exe / NSIS Installer)
-```powershell
-wails build
-wails build -nsis
-```
-Output: `build/bin/coffee24h.exe` & `build/bin/coffee24h-installer.exe`
 
 ---
 
