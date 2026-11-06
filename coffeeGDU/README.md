@@ -15,7 +15,8 @@
   <a href="https://github.com/nynwadhyhcz8/Coffee24h"><img src="https://img.shields.io/badge/Release-v1.0.0-blue.svg?style=flat-square" alt="Version" /></a>
   <a href="https://golang.org"><img src="https://img.shields.io/badge/Go-1.22+-00ADD8.svg?style=flat-square&logo=go" alt="Go Version" /></a>
   <a href="https://wails.io"><img src="https://img.shields.io/badge/Framework-Wails%20v2-DF1A29.svg?style=flat-square" alt="Wails v2" /></a>
-  <a href="#-installation-guide-windows-macos-linux"><img src="https://img.shields.io/badge/Install-Windows%20%7C%20macOS%20%7C%20Linux-brightgreen.svg?style=flat-square" alt="Multi-OS Install" /></a>
+  <a href="#-installation-guide-windows-macos-linux-npm"><img src="https://img.shields.io/badge/Install-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20NPM-brightgreen.svg?style=flat-square" alt="Multi-OS Install" /></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/NPM-Node.js%20Ready-CB3837.svg?style=flat-square&logo=npm" alt="NPM" /></a>
   <a href="https://github.com/nynwadhyhcz8/Coffee24h/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License" /></a>
 </p>
 
@@ -25,10 +26,11 @@
 1. [🎓 About Gia Dinh University (GDU)](#-about-gia-dinh-university-gdu)
 2. [🌌 The Mission: Paving the Way for a University Operating System](#-the-mission-paving-the-way-for-a-university-operating-system-gdu-os)
 3. [⚡ Core Capabilities & Keep-Awake Modes](#-core-capabilities--keep-awake-modes)
-4. [📥 Installation Guide (Windows, macOS, Linux)](#-installation-guide-windows-macos-linux)
+4. [📥 Installation Guide (Windows, macOS, Linux, NPM)](#-installation-guide-windows-macos-linux-npm)
    - [🪟 Windows Setup](#-1-windows-installation-windows-10--11)
    - [🍎 macOS Setup](#-2-macos-installation-apple-silicon--intel)
    - [🐧 Linux Setup](#-3-linux-installation-ubuntu-debian-fedora-arch)
+   - [📦 NPM & Node.js](#-4-npm--nodejs-cli--web-preview)
 5. [🖥️ Cross-Platform Architecture](#️-cross-platform-architecture)
 6. [🛠️ Building from Source & Packaging](#️-building-from-source--packaging)
 7. [⚙️ Various Ways to Set Up Coffee24h](#️-various-ways-to-set-up-coffee24h)
@@ -155,6 +157,39 @@ chmod +x Coffee24h-x86_64.AppImage
 sudo install -m 755 coffee24h /usr/local/bin/coffee24h
 sudo cp build/linux/coffee24h.desktop /usr/share/applications/
 sudo cp build/linux/coffee24h.png /usr/share/icons/hicolor/256x256/apps/
+```
+
+---
+
+### 📦 4. NPM & Node.js (CLI & Web Preview)
+
+#### Option A: NPM Start & CLI Execution
+```bash
+# Run immediately via Node launcher:
+npm start
+
+# Forward flags to the native binary:
+npm start -- --awake --time 2h
+npm start -- --student
+```
+
+#### Option B: Global NPM CLI Installation
+```bash
+# From the repository root:
+npm install -g .
+
+# Use globally across any terminal session:
+coffee24h --awake
+coffee24h --tray
+```
+
+#### Option C: Browser UI Live Preview via Vite
+Test the full GDU Glassmorphism interface, animations, and Web Audio API synthesizer directly in your web browser:
+```bash
+cd frontend
+npm install
+npm run dev
+# Live preview accessible at http://localhost:5173
 ```
 
 ---

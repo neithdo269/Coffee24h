@@ -1,0 +1,36 @@
+{
+  "name": "coffee24h",
+  "version": "1.0.0",
+  "description": "Cross-Platform Keep-Awake Daemon & System Power Utility (GDU Edition)",
+  "main": "cli/coffee24h.js",
+  "bin": {
+    "coffee24h": "./cli/coffee24h.js",
+    "coffee-gdu": "./cli/coffee24h.js"
+  },
+  "scripts": {
+    "start": "node ./cli/coffee24h.js",
+    "dev": "npm --prefix coffeeGDU/frontend run dev",
+    "build": "npm --prefix coffeeGDU/frontend run build",
+    "preview": "npm --prefix coffeeGDU/frontend run preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nynwadhyhcz8/Coffee24h.git"
+  },
+  "keywords": [
+    "keep-awake",
+    "caffeine",
+    "power-management",
+    "gdu",
+    "gia-dinh-university",
+    "wails",
+    "desktop-utility",
+    "cli"
+  ],
+  "author": "Neith Do <16av112thien@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nynwadhyhcz8/Coffee24h/issues"
+  },
+  "homepage": "https://github.com/nynwadhyhcz8/Coffee24h#readme"
+}
