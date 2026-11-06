@@ -13,7 +13,8 @@
 5. [Bài Học Gỡ Lỗi #4: Triệt Tiêu Race Condition Bằng Atomic `sync.Mutex`](#5-bài-học-gỡ-lỗi-4-triệt-tiêu-race-condition-bằng-atomic-syncmutex)
 6. [Bài Học Gỡ Lỗi #5: Tự Phục Hồi Khay Hệ Thống Khi Explorer Crash (`TaskbarCreated`)](#6-bài-học-gỡ-lỗi-5-tự-phục-hồi-khay-hệ-thống-khi-explorer-crash)
 7. [Bài Học Gỡ Lỗi #6: Kiến Trúc Clean Code Đổi Phiên Bản `GDU` ⇄ `GDU student`](#7-bài-học-gỡ-lỗi-6-kiến-trúc-clean-code-đổi-phiên-bản)
-8. [Cẩm Nang Tái Sử Dụng Code Cho Các Dự Án Desktop Tương Lai](#8-cẩm-nang-tái-sử-dụng-code-cho-các-dự-án-desktop-tương-lai)
+8. [Bài Học Gỡ Lỗi #7: Khắc Phục Hiện Tượng "Chỉ Bo Tròn Góc Trái Dưới, 3 Góc Còn Lại Vuông Nhọn"](#8-bài-học-gỡ-lỗi-7-khắc-phục-hiện-tượng-chỉ-bo-tròn-góc-trái-dưới-3-góc-còn-lại-vuông-nhọn)
+9. [Cẩm Nang Tái Sử Dụng Code Cho Các Dự Án Desktop Tương Lai](#9-cẩm-nang-tái-sử-dụng-code-cho-các-dự-án-desktop-tương-lai)
 
 ---
 
@@ -285,18 +286,91 @@ function normalizeEdition(edition) {
 
 ---
 
-## 8. Cẩm Nang Tái Sử Dụng Code Cho Các Dự Án Desktop Tương Lai
+## 8. Bài Học Gỡ Lỗi #7: Khắc Phục Hiện Tượng "Chỉ Bo Tròn Góc Trái Dưới, 3 Góc Còn Lại Vuông Nhọn"
+
+### ⚠️ Hiện Tượng Lỗi Kỳ Lạ
+Sau khi đã gỡ bỏ hoàn toàn mặt nạ 1-bit `SetWindowRgn` và đặt `border-radius: 14px` trên thẻ `body`, người dùng phản ánh trên Windows 10 (laptop ASUS ROG GL552VX):
+> *"Hiện tại chỉ có góc trái phía dưới của application là được bo tròn, còn lại 3 góc (trái trên, phải trên, phải dưới) vẫn bị vuông nhọn!"*
+
+### 🔍 Nguyên Nhân Kép Sâu Xa (CSS Spec & DWM Win32)
+1. **Quy chuẩn CSS Canvas Background Propagation (W3C Spec):**
+   - Theo đặc tả W3C, khi phần tử gốc `html` có nền trong suốt (`background: transparent`), trình duyệt Chromium sẽ **tự động lấy thuộc tính `background` của thẻ `body` lan truyền (propagate) ra toàn bộ canvas viewport** của cửa sổ.
+   - Do đó, dù `body` có `border-radius: 14px`, 4 góc vuông của canvas bên ngoài bán kính cong vẫn bị tô kín bởi nền màu `radial-gradient`.
+2. **DWM Frame Extension của Windows 10 & Cơ Chế Padding Wails:**
+   - Trong Wails, cấu hình `DisableFramelessWindowDecorations: false` khiến Wails gọi `DwmExtendFrameIntoClientArea(hwnd, &margins{1,1,1,1})`.
+   - Trên Windows 10, lệnh này vẽ một khung chữ nhật DWM mờ 1px không trong suốt xung quanh cửa sổ, đè lên các góc cong.
+   - Đồng thời, Wails xử lý `WM_NCCALCSIZE` bằng cách bù trừ 1px ở đáy (`rgrc.Bottom += 1` và `w.SetPadding(edge.Rect{Bottom: 1})`).
+   - Khoảng bù trừ 1px ở đáy này đã vô tình để lộ đường cong ở góc dưới bên trái, trong khi 3 góc còn lại (trên trái, trên phải, dưới phải) bị viền DWM và nền canvas vuông che lấp hoàn toàn thành góc nhọn 90 độ!
+
+### 💡 Giải Pháp Kiến Trúc Dứt Điểm (Shell Container Pattern)
+
+#### 1. Tách biệt Nền Trong Suốt và Vỏ Bọc Shell trong CSS (`style.css`):
+Giữ cả `html` và `body` ở chế độ trong suốt tuyệt đối để Chromium không bao giờ lan truyền background ra canvas. Toàn bộ nền gradient, viền phát quang và `border-radius: 14px` được chuyển sang thẻ vỏ bọc `#app` (`div` shell):
+
+```css
+/* frontend/src/style.css */
+html, body {
+  background: transparent !important;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Thẻ Shell bọc toàn bộ ứng dụng - Chịu trách nhiệm bo tròn 4 góc */
+#app {
+  font-family: var(--font-family);
+  background: radial-gradient(circle at 50% 0%, #0d274c 0%, #061120 100%);
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 14px; /* Bo cong hoàn hảo 4 góc */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0); /* Kích hoạt tăng tốc phần cứng GPU khử răng cưa */
+}
+```
+
+#### 2. Vô hiệu hóa DWM Frame trong Go (`main.go`):
+Bật `DisableFramelessWindowDecorations: true` kết hợp `WebviewIsTransparent: true` và `WindowIsTranslucent: true`. Thao tác này loại bỏ hoàn toàn viền chữ nhật DWM của Win10, biến toàn bộ cửa sổ thành mặt phẳng DirectComposition 32-bit ARGB thuần khiết:
+
+```go
+// main.go
+BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0}, // Trong suốt tuyệt đối
+Windows: &windows.Options{
+    WebviewIsTransparent:              true,
+    WindowIsTranslucent:               true, // Kích hoạt WS_EX_NOREDIRECTIONBITMAP cho DirectComposition
+    DisableFramelessWindowDecorations: true, // Vô hiệu hóa viền chữ nhật DWM Windows 10
+},
+```
+
+#### 3. Kết Quả:
+Cả 4 góc ngoài bán kính cong 14px của `#app` hoàn toàn trong suốt để lộ hình nền desktop bên dưới. Toàn bộ 4 góc (trên trái, trên phải, dưới phải, dưới trái) đều được bo tròn đối xứng, mượt mà và không hề có bất kỳ góc nhọn hay vỡ hạt pixel nào!
+
+---
+
+## 9. Cẩm Nang Tái Sử Dụng Code Cho Các Dự Án Desktop Tương Lai
 
 Khi phát triển các ứng dụng Desktop Windows sử dụng **Go + Wails v2**:
 
 | Thành Phần | Giải Pháp Tốt Nhất | Lý Do / Hiệu Quả |
 | :--- | :--- | :--- |
-| **Cửa sổ bo góc** | `BackgroundColour: {0,0,0,0}` + `WebviewIsTransparent: true` + CSS `transform: translateZ(0)` | Khử răng cưa bằng GPU 32-bit ARGB, không bao giờ dùng `SetWindowRgn` 1-bit |
+| **Cửa sổ bo tròn 4 góc hoàn hảo** | Nền trong suốt trên `html, body` + Shell `#app` bo góc 14px + `DisableFramelessWindowDecorations: true` | Khắc phục triệt để lỗi Chromium lan truyền background ra canvas và viền DWM của Win 10, hiển thị mượt mà 4 góc đối xứng |
 | **Ghim luồng Win32** | `runtime.LockOSThread()` trong Goroutine riêng | Chống Go Scheduler di chuyển luồng làm mất cờ API hệ điều hành |
 | **Khay hệ thống** | Đăng ký `RegisterWindowMessageW("TaskbarCreated")` | Tự động phục hồi icon nếu Explorer.exe bị khởi động lại |
 | **An toàn luồng** | `sync.Mutex` cho mọi thao tác ghi State & đóng Channel | Triệt tiêu hoàn toàn lỗi panic và Race Condition |
 | **Bố cục co giãn** | Dùng class CSS cục bộ (Scoped Class) như `.mode-timed` | Đảm bảo tính toán khoảng cách pixel hoàn hảo cho từng chế độ |
 | **Âm thanh ngoại tuyến** | Web Audio API Oscillator (`triangle` / `sine`) | Không cần phụ thuộc file âm thanh `.wav`/`.mp3` cồng kềnh, chạy 100% offline |
+| **Quản lý đa phiên bản** | `Object.freeze` + `normalizeEdition()` | Clean code, Single Source of Truth, dễ mở rộng và bảo trì |
 
 ---
 *Tài liệu được khởi tạo và lưu trữ trong mã nguồn dự án Coffee24h.*

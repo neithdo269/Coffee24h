@@ -35,7 +35,8 @@
 6. [🛠️ Building from Source & Packaging](#️-building-from-source--packaging)
 7. [⚙️ Various Ways to Set Up Coffee24h](#️-various-ways-to-set-up-coffee24h)
 8. [💻 Command-Line Interface (CLI)](#-command-line-interface-cli)
-9. [👨‍💻 Author & Mission Dedication](#-author--mission-dedication)
+9. [📖 Developer Guide & Architecture Lessons](#-developer-guide--architecture-lessons)
+10. [👨‍💻 Author & Mission Dedication](#-author--mission-dedication)
 
 ---
 
@@ -290,6 +291,22 @@ Examples:
   coffee24h -s --time 1h       # 1 hour system-only awake (screen turns off, CPU runs)
   coffee24h --student          # Launch directly with GDU Student Edition
 ```
+
+---
+
+## 📖 Developer Guide & Architecture Lessons
+
+For software engineers, students, and researchers interested in building hybrid desktop applications with Go, Win32 API, and Wails, full architectural insights and troubleshooting case studies are documented in [`DEVELOPER_GUIDE.md`](./DEVELOPER_GUIDE.md):
+
+- **Lesson #1:** Subpixel Anti-Aliasing on 4 Rounded Corners vs 1-bit GDI Region Clipping.
+- **Lesson #2:** Scoped Adaptive Layout CSS for Timed Countdown mode without breaking 350x350 square layout.
+- **Lesson #3:** Pinning Win32 Power Management Thread (`runtime.LockOSThread`) against Go M:N Scheduler thread-migration.
+- **Lesson #4:** Eliminating TOCTOU Race Conditions via Atomic Mutex locks.
+- **Lesson #5:** Automatic System Tray Icon Restoration on Windows Explorer Crash (`TaskbarCreated` Broadcast Message).
+- **Lesson #6:** Clean Code Single Source of Truth architecture for dynamic Lecturer ⇄ Student edition switching.
+- **Lesson #7:** Solving the "Only Bottom-Left Rounded / 3 Corners Sharp" problem via Shell Container `#app` pattern & disabling DWM frameless window decorations.
+
+👉 **Read the full developer manual:** [`DEVELOPER_GUIDE.md`](./DEVELOPER_GUIDE.md)
 
 ---
 

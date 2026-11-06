@@ -37,7 +37,8 @@
 7. [🛠️ Build from Source & Packaging](#️-build-from-source--packaging)
 8. [⚙️ 1-Click Multi-Setup Manager](#️-1-click-multi-setup-manager)
 9. [💻 Command-Line Interface (CLI)](#-command-line-interface-cli)
-10. [👨‍💻 Author & Acknowledgments](#-author--acknowledgments)
+10. [📖 Developer Guide & Architecture Lessons (Cẩm Nang Lập Trình Viên)](#-developer-guide--architecture-lessons)
+11. [👨‍💻 Author & Acknowledgments](#-author--acknowledgments)
 
 ---
 
@@ -388,6 +389,22 @@ coffee24h --time 2h --autolock     # Keep awake for 2 hours, then lock machine
 coffee24h -s --time 1h             # 1 hour background compute (screen can sleep)
 coffee24h --student                # Launch directly in GDU Student Edition
 ```
+
+---
+
+## 📖 Developer Guide & Architecture Lessons
+
+To ensure maintainability, code quality, and knowledge transfer for future desktop engineering projects, comprehensive architectural notes and in-depth troubleshooting case studies are documented in [`DEVELOPER_GUIDE.md`](./DEVELOPER_GUIDE.md):
+
+- **Lesson #1:** Subpixel Anti-Aliasing on 4 Rounded Corners vs 1-bit GDI Region Clipping.
+- **Lesson #2:** Scoped Adaptive Layout CSS for Timed Countdown mode without breaking 350x350 square layout.
+- **Lesson #3:** Pinning Win32 Power Management Thread (`runtime.LockOSThread`) against Go M:N Scheduler thread-migration.
+- **Lesson #4:** Eliminating TOCTOU Race Conditions via Atomic Mutex locks.
+- **Lesson #5:** Automatic System Tray Icon Restoration on Windows Explorer Crash (`TaskbarCreated` Broadcast Message).
+- **Lesson #6:** Clean Code Single Source of Truth architecture for dynamic Lecturer ⇄ Student edition switching.
+- **Lesson #7:** Solving the "Only Bottom-Left Rounded / 3 Corners Sharp" problem via Shell Container `#app` pattern & disabling DWM frameless window decorations.
+
+👉 **Read the full developer manual:** [`DEVELOPER_GUIDE.md`](./DEVELOPER_GUIDE.md)
 
 ---
 
